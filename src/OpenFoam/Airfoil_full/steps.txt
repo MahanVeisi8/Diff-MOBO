@@ -1,0 +1,4 @@
+1. We start with ganymede sever as the head quarter
+2. on dione, carpo and puck run the docker and note the id
+3. Update the run_rand_dset.py with the correct id values 
+4. 
