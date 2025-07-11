@@ -40,3 +40,7 @@ docker/
 # Other binaries you might generate
 *.exe
 *.dll
+
+# data's & model weigths
+data/
+model_weigths/
