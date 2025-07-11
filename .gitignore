@@ -1,0 +1,42 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Virtual environments
+venv/
+env/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Data files
+*.mat
+*.npy
+*.npz
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+
+# Docker images/archives (anywhere in repo)
+docker/
+*.docker
+*docker*.tar
+
+# PyTorch model checkpoints
+*.pt
+
+# Other binaries you might generate
+*.exe
+*.dll
