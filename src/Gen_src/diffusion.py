@@ -253,6 +253,63 @@ class GaussianDiffusion1D(Module):
         return sample_fn((batch_size, channels, seq_length))
 
     @torch.no_grad()
+    def latent_sample(self, latent ,clip_denoised=False ,is_ddim = False, conditioning = None , ddim_sigma= 0):
+        """
+        input:
+            latent -> torch.randn((batch,2,192))
+        
+        """
+        seq_length, channels = self.seq_length, self.channels
+        sample_fn = self.p_sample_loop if not self.is_ddim_sampling else self.ddim_sample
+        if not is_ddim:
+            # return  self.p_sample_loop((latent.shape[0], channels , seq_length))
+            batch, device = latent.shape[0], self.betas.device
+            # initalized  latent from N(0,I)
+            img = latent
+
+            x_start = None
+
+            for t in tqdm(reversed(range(0, self.num_timesteps)), desc = 'sampling loop time step', total = self.num_timesteps):
+                img, x_start = self.p_sample(img, t)
+
+            img = self.unnormalize(img)
+            return img
+        
+        batch, device, total_timesteps, sampling_timesteps, eta, objective = latent.shape[0], self.betas.device, self.num_timesteps, self.sampling_timesteps, self.ddim_sampling_eta, self.objective
+        times = torch.linspace(-1, total_timesteps - 1, steps=sampling_timesteps + 1)   # [-1, 0, 1, 2, ..., T-1] when sampling_timesteps == total_timesteps
+        times = list(reversed(times.int().tolist()))
+        time_pairs = list(zip(times[:-1], times[1:])) # [(T-1, T-2), (T-2, T-3), ..., (1, 0), (0, -1)]
+
+        img = latent
+
+        x_start = None
+
+        for time, time_next in tqdm(time_pairs, desc = 'sampling loop time step'):
+            time_cond = torch.full((batch,), time, device=device, dtype=torch.long)
+            pred_noise, x_start, *_ = self.model_predictions(img, time_cond, clip_x_start = clip_denoised)
+
+            if time_next < 0:
+                img = x_start
+                continue
+
+            alpha = self.alphas_cumprod[time]
+            alpha_next = self.alphas_cumprod[time_next]
+
+            # sigma = eta * ((1 - alpha / alpha_next) * (1 - alpha_next) / (1 - alpha)).sqrt()
+            sigma =ddim_sigma
+            c = (1 - alpha_next - sigma ** 2).sqrt()
+
+            noise = torch.randn_like(img)
+
+            img = x_start * alpha_next.sqrt() + \
+                  c * pred_noise + \
+                  sigma * noise
+
+        img = self.unnormalize(img)
+        return img
+        
+
+    @torch.no_grad()
     def interpolate(self, x1, x2, t = None, lam = 0.5):
         b, *_, device = *x1.shape, x1.device
         t = default(t, self.num_timesteps - 1)
