@@ -151,5 +151,3 @@ src/optimization_loop/run_results.npy
 ```
 
 
-
-
