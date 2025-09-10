@@ -1,6 +1,4 @@
 
-### `/src/diffusion_core/README.md`
-
 # diffusion_core
 
 Lightweight 1D diffusion for parametric airfoil shapes.
