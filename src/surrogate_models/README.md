@@ -1,6 +1,3 @@
-
-### `/src/surrogate_models/README.md`
-```markdown
 # surrogate_models
 
 Lightweight regressors to approximate CFD metrics (e.g., lift/drag) for fast screening.
