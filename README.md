@@ -1,12 +1,30 @@
 # Generative Airfoil
 
+<img src="assets/creative_diffusion_logo.png" alt="Creative Diffusion Logo" width="200"/>
+
 Generate, simulate, and evaluate 2D airfoil shapes using diffusion models, Bayesian optimization, neural surrogates, and OpenFOAM.
+
+---
+
+## Overview
+
+<p align="center">
+  <img src="assets/schematic_overview.png" alt="High-level schematic overview" width="600"/>
+</p>
+
+*Temporary figure — shows the conceptual flow of the diffusion + surrogate + optimization loop.*
+
+<p align="center">
+  <img src="assets/total_flowchart.png" alt="Full flowchart of the pipeline" width="800"/>
+</p>
+
+*Temporary figure — illustrates the detailed data flow between modules.*
 
 ---
 
 ## Quickstart
 
-**Option A — CPU‑only (surrogate evaluation):**
+**Option A — CPU-only (surrogate evaluation):**
 
 ```bash
 python -m venv .venv && source .venv/bin/activate  # (Windows) .venv\Scripts\activate
@@ -16,7 +34,7 @@ pip install -r src/optimization_loop/requirements.txt
 python src/optimization_loop/outerloop_creation.py \
   --mode surrogate --n_samples 64 \
   --out artifacts/run_$(date +%Y%m%d_%H%M%S)/results.npy
-```
+````
 
 **Option B — Full physics (OpenFOAM in Docker):**
 
@@ -48,6 +66,7 @@ See full steps: [Docker/OpenFOAM setup](src/optimization_loop/docker_openfoam_se
 │   └─ surrogate_models/        # Surrogate models for fast evaluation
 │
 ├─ artifacts/                   # Run outputs, weights, results (Git LFS)
+├─ assets/                      # Figures, logos, diagrams
 ├─ .gitignore
 └─ README.md (this file)
 ```
@@ -105,3 +124,5 @@ Outputs are saved under `artifacts/run_YYYYmmdd_HHMMSS/`.
 ## License
 
 MIT (see `LICENSE`).
+
+
