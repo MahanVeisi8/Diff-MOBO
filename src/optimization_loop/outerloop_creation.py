@@ -1,5 +1,6 @@
 import numpy as np
 import os , sys
+os.environ("pip install -r requirements.txt")
 sys.path.append("..")
 sys.path.append("../..")
 sys.path.append("src/")
@@ -29,7 +30,7 @@ saving_path = rf"src/optimization_loop/run_results.npy"
 ******************************
 ******************************
 warning:
-    before runngin make sure to copy src/OpenFoam/Airfoil_simulation_1/OpenFOAM_0
+    before running make sure to copy src/OpenFoam/Airfoil_simulation_1/OpenFOAM_0
     in that folder 200 times with new directories name as src/OpenFoam/Airfoil_simulation_1/OpenFOAM_i 
 ******************************
 ******************************

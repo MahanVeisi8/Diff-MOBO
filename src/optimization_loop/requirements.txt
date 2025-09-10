@@ -1,0 +1,6 @@
+wandb
+accelerate
+ema-pytorch
+tqd
+einops
+denoising-diffusion-pytorch
