@@ -1,6 +1,6 @@
 
 ### `/src/diffusion_core/README.md`
-```markdown
+
 # diffusion_core
 
 Lightweight 1D diffusion for parametric airfoil shapes.
@@ -19,3 +19,4 @@ from diffusion_core.diffusion import GaussianDiffusion1D
 model = Unet1D(dim=64, dim_mults=(1,2,4))
 gauss = GaussianDiffusion1D(model, timesteps=1000)
 # gauss.train(...) / gauss.sample(...)
+```
