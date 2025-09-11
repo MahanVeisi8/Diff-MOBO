@@ -19,7 +19,7 @@ from ema_pytorch import EMA
 from tqdm.auto import tqdm
 from denoising_diffusion_pytorch.version import __version__
 
-from Gen_src.utils import *
+from diffusion_core.utils import *
 
 
 # small helper modules

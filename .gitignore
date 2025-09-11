@@ -50,4 +50,4 @@ model_weigths/
 !src/diffusion_notebooks/DIffusion_model_weigths_and_datas/dpp_0.1_autonorm_true_125_from_base_ddpm/model_epoch_124.pt
 !src/surrogate_models/Surrogate_Model_weigths/just_for_cd_200_300_300_200/mlp_best_model.pt
 !src/surrogate_models/Surrogate_Model_weigths/just_for_cl_150_200_200_150/mlp_best_model.pt
-!data/raw
+!data/raw/coord_min_max.npy

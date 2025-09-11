@@ -51,7 +51,10 @@ Check running containers:
 ```bash
 docker ps -a
 ```
-
+then confirm that this docker container is starting and running
+* ```bash
+    docker start name_of_the_container 
+  ```
 Open a bash shell inside:
 
 ```bash
@@ -121,7 +124,7 @@ src/optimization_loop/run_results.npy
 
 ---
 
-## Troubleshooting
+## Troubleshooting(not necessery)
 
 * **Permission denied for `Allclean`:**
 

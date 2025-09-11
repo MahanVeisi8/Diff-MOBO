@@ -1,6 +1,5 @@
 import numpy as np
 import os , sys
-os.environ("pip install -r requirements.txt")
 sys.path.append("..")
 sys.path.append("../..")
 sys.path.append("src/")
@@ -9,8 +8,8 @@ sys.path.append("src/diffusion_notebooks")
 sys.path.append("data/")
 sys.path.append(os.path.abspath(".."))
 sys.path.append(os.path.abspath("../.."))
-from Gen_src.diffusion import GaussianDiffusion1D
-from Gen_src.model import Unet1D
+from diffusion_core.diffusion import GaussianDiffusion1D
+from diffusion_core.model import Unet1D
 import torch
 import os,sys
 import torch
@@ -21,8 +20,10 @@ from OpenFoam.Airfoil_simulation_1.ShapeToPerformance import shape_to_performanc
 # docker_mount_path = "/home/bardiya/projects/diffusion_air_manifolding/codes/creative-generativeai-diffusion/src/OpenFoam"
 # docker_mount_path = "/home/bardiya/projects/diffusion_air_manifolding/codes/Airfoil_MPI_system"
 docker_mount_path = "src/OpenFoam"
-NUM_TO_GENERATE = 10000
-BATCH_SIZE = 128
+# NUM_TO_GENERATE = 10000
+# BATCH_SIZE = 128
+NUM_TO_GENERATE = 2
+BATCH_SIZE = 2
 docker_container_id = "78257c051b5b" 
 saving_path = rf"src/optimization_loop/run_results.npy"
 
