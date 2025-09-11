@@ -39,7 +39,7 @@ warning:
 
 
 
-DATA_DIR = Path(rf"data/raw")
+DATA_DIR = Path(rf"data")
 coord_mm = np.load(DATA_DIR/"coord_min_max.npy")  # [[x_min,y_min],[x_max,y_max]]
 x_min,y_min = coord_mm[0]; x_max,y_max = coord_mm[1]
 
