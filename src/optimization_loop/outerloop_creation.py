@@ -24,7 +24,7 @@ NUM_TO_GENERATE = 10000
 BATCH_SIZE = 128
 # NUM_TO_GENERATE = 2
 # BATCH_SIZE = 2
-docker_container_id = "78257c051b5b" 
+docker_container_id = "f897792b6b56" 
 saving_path = rf"src/optimization_loop/run_results.npy"
 
 """
@@ -32,7 +32,7 @@ saving_path = rf"src/optimization_loop/run_results.npy"
 ******************************
 warning:
     before running make sure to copy src/OpenFoam/Airfoil_simulation_1/OpenFOAM_0
-    in that folder 200 times with new directories name as src/OpenFoam/Airfoil_simulation_1/OpenFOAM_i 
+    in that folder 200 times with new directories name as src/OpenFoam/Airfoil_simulation_1/OpenFOAM_i for the i'th core ussage
 ******************************
 ******************************
 """
