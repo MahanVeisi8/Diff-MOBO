@@ -26,6 +26,8 @@ BATCH_SIZE = 128
 # BATCH_SIZE = 2
 docker_container_id = "f897792b6b56" 
 saving_path = rf"src/optimization_loop/run_results.npy"
+device = "cpu"
+# device = "cuda"
 
 """
 ******************************
@@ -59,7 +61,7 @@ if __name__ == "__main__":
         dim_mults=(2, 4, 8, 16),
         channels=2,  # X and Y
         dropout=0.1
-    ).cuda()  # or .to(device)
+    ).to(device)  # or .to(device)
 
     # Create the same diffusion wrapper
     diffusion = GaussianDiffusion1D(
@@ -68,7 +70,7 @@ if __name__ == "__main__":
         objective='pred_noise',
         timesteps=1000,
         auto_normalize=False
-    ).cuda()  # or .to(device)
+    ).to(device)  # or .to(device)
 
     # Load checkpoint
     checkpoint_path = rf"src/diffusion_notebooks/DIffusion_model_weigths_and_datas/dpp_0.1_autonorm_true_125_from_base_ddpm/model_epoch_124.pt"
@@ -86,7 +88,7 @@ if __name__ == "__main__":
         while done < num_to_generate:
             cur = min(batch_size, num_to_generate - done)
             
-            latent = torch.randn((cur,2,192)).to("cuda")
+            latent = torch.randn((cur,2,192)).to(device)
             samples = diffusion.latent_sample(latent , is_ddim=True)
             generated_real = inv_coords(samples)
             
