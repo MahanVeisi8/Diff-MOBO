@@ -4,3 +4,5 @@ ema-pytorch
 tqd
 einops
 denoising-diffusion-pytorch
+pymoo
+cython
