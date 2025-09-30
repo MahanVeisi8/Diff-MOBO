@@ -7,15 +7,21 @@ from Airfoil_simulation_3.ShapeToPerformance import shape_to_performance as STP3
 import argparse
 import os,sys
 
+# change the num cores after copy ans pasting its  really important
+NUM_CORES = 2
+
 DB2 = np.load(rf"DB2.npy",allow_pickle=True).item()
 airfoil_shape = DB2["shapes"]
 print(airfoil_shape.shape)
-DB2_p = DB2["performances"]
-if DB2_p == None:
-    performance = STP1(airfoil_shape)
-else:
-    performance = STP1(airfoil_shape)
-print(performance)
-
-np.save("performance.npy" , performance)
+total_shapes = len(airfoil_shape)
+done = 0
+all_performances = []
+while done < total_shapes:
+    cur = min(NUM_CORES, total_shapes - done)
+    batch = airfoil_shape[done:done+cur , :,:]
+    performance = STP1(batch)
+    print(performance)
+    all_performances.append(performance)
+    done += cur
+np.save("performance.npy" , np.vstack(all_performances))
 print("done!!!")
