@@ -7,12 +7,12 @@ from Airfoil_simulation_3.ShapeToPerformance import shape_to_performance as STP3
 import argparse
 import os,sys
 
-
 NUM_CORES = 2
 
-DB2 = np.load(rf"DB2.npy",allow_pickle=True).item()
-airfoil_shape = DB2["shapes"]
-print(airfoil_shape.shape)
+DB = np.load(rf"DB_CFD.npy",allow_pickle=True).item()
+airfoil_shape = DB["shapes"]
+DB_p = DB["performance"]
+
 total_shapes = len(airfoil_shape)
 done = 0
 all_performances = []
@@ -23,5 +23,12 @@ while done < total_shapes:
     print(performance)
     all_performances.append(performance)
     done += cur
-np.save("performance.npy" , np.vstack(all_performances))
-print("done!!!")
+
+
+np.save("DB_CFD.npy" , {
+    "latents" : DB["latents"],
+    "shapes" : DB["shapes"],
+    "performance" : np.vstack(all_performances),
+})
+
+print("CFD simulation done!!!")
