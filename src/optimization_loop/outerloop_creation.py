@@ -24,7 +24,7 @@ NUM_TO_GENERATE = 10000
 BATCH_SIZE = 128
 # NUM_TO_GENERATE = 2
 # BATCH_SIZE = 2
-docker_container_id = "f897792b6b56" 
+docker_container_id = "1acb6d8fa14a" 
 saving_path = rf"src/optimization_loop/run_results.npy"
 device = "cpu"
 # device = "cuda"
@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
     # Load checkpoint
     checkpoint_path = rf"src/diffusion_notebooks/DIffusion_model_weigths_and_datas/dpp_0.1_autonorm_true_125_from_base_ddpm/model_epoch_124.pt"
-    model.load_state_dict(torch.load(checkpoint_path, weights_only=True))
+    model.load_state_dict(torch.load(checkpoint_path, weights_only=True, map_location=device))
     model.eval()
     print("Loaded model weights from:", checkpoint_path)
 
