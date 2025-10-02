@@ -16,12 +16,13 @@ import torch
 import os
 from pathlib import Path
 from OpenFoam.Airfoil_simulation_1.ShapeToPerformance import shape_to_performance as STP1
+import pickle
 
 # docker_mount_path = "/home/bardiya/projects/diffusion_air_manifolding/codes/creative-generativeai-diffusion/src/OpenFoam"
 # docker_mount_path = "/home/bardiya/projects/diffusion_air_manifolding/codes/Airfoil_MPI_system"
 docker_mount_path = "src/OpenFoam"
-NUM_TO_GENERATE = 300
-BATCH_SIZE = 128
+NUM_TO_GENERATE = 1000
+BATCH_SIZE = 256
 # NUM_TO_GENERATE = 2
 # BATCH_SIZE = 2
 docker_container_id = "60cd59b630d7" 
@@ -55,6 +56,13 @@ def inv_coords(xs_s):                   # xs_s shape (...,2,192) tensor
 
 if __name__ == "__main__":
 
+    print("loading DB...")
+    db2_path = os.path.join(docker_mount_path , "DB2.npy")
+    data_dict = pickle.load(open(db2_path, "rb"))
+
+    all_latent = data_dict['latents']
+    all_shapes = data_dict['shapes']
+
     print("================================")
     print(rf"starting openfoam in mount path {docker_mount_path} with docker container {docker_container_id}")
     command = (
@@ -69,9 +77,12 @@ if __name__ == "__main__":
 
     performance_path =os.path.join(docker_mount_path , rf"performance.npy")
     perfromance = np.load(performance_path,allow_pickle=True)
+
+    
+
     np.save(saving_path, {
-        "latents": np.vstack(all_latent),
-        "shapes": np.vstack(all_shapes),
+        "latents": all_latent,
+        "shapes": all_shapes,
         "performances": perfromance
     })
     print("creating the results finished !!!")

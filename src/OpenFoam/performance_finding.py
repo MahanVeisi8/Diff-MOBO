@@ -7,10 +7,10 @@ from Airfoil_simulation_3.ShapeToPerformance import shape_to_performance as STP3
 import argparse
 import os,sys
 import pickle 
-
+import traceback
 
 # change the num cores after copy ans pasting its  really important
-NUM_CORES = 2
+NUM_CORES = 200
 
 # DB2 = np.load(rf"src/OpenFoam/DB2.npy",allow_pickle=True).item()
 with open("DB2.npy", "rb") as f:
@@ -23,7 +23,13 @@ all_performances = []
 while done < total_shapes:
     cur = min(NUM_CORES, total_shapes - done)
     batch = airfoil_shape[done:done+cur , :,:]
-    performance = STP1(batch)
+    try:
+        performance = STP1(batch)
+    except Exception as e:
+        print("Exception in worker process:")
+        traceback.print_exc()
+        raise
+    # # performance = STP1(batch)
     print(performance)
     all_performances.append(performance)
     done += cur

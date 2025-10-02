@@ -1,3 +1,5 @@
+# Specific directories
+src/OpenFoam/Airfoil_simulation_1/OpenFOAM*
 # Byte-compiled / cache
 __pycache__/
 *.py[cod]

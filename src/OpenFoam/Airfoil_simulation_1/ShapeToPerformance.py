@@ -192,10 +192,11 @@ def calculate_cd_cl_res(n, sample_num, airfoil_sample_train):
     print("\tUsing len %5.3f angle %+5.3f " % (length, angle))
     print("\tResulting freestream vel x,y: {},{}".format(fsX, fsY))
 
-    # Make sure these exist
+    # Make sure these exist. Without this, we skip to 
     os.makedirs("./Airfoil_simulation_1/results/", exist_ok=True)
-    with open("./Airfoil_simulation_1/results/%d.txt" % (sample_num), "w") as f:
-        pass
+    if not os.path.exists("./Airfoil_simulation_1/results/%d.txt" % (sample_num)):
+        with open("./Airfoil_simulation_1/results/%d.txt" % (sample_num), "w") as f:
+            pass
 
     os.chdir("./Airfoil_simulation_1/OpenFOAM_%d/" % (n))
 
@@ -268,8 +269,12 @@ def shape_to_performance(airfoil_sample_train):
     # num_files = len([name for name in os.listdir(Data_path) if os.path.isfile(os.path.join(Data_path, name))])
     cd = []
     cl = []
+    # We want to append txt files
     files_list = [os.path.join(Data_path, f) for f in os.listdir(Data_path) if os.path.isfile(os.path.join(Data_path, f))]
-    files_num = [f for f in os.listdir(Data_path) if os.path.isfile(os.path.join(Data_path, f))]
+    # filter out empty txt files. empty files will cause stopiteration error below.
+    files_list = [f for f in files_list if os.path.getsize(f) > 0]
+    # files_num = [f for f in os.listdir(Data_path) if os.path.isfile(os.path.join(Data_path, f))]
+    files_num = [os.path.basename(f) for f in files_list]
 
     files_list.sort()
     numbers_array = []
@@ -282,9 +287,19 @@ def shape_to_performance(airfoil_sample_train):
             
     
     for file in files_list:
-        with open(file) as f:
-            cl = np.append(cl, float(next(f).split()[0]))
-            cd = np.append(cd, float(next(f).split()[0]))
+        with open(file) as f:               
+            try:
+                cl = np.append(cl, float(next(f).split()[0]))
+            except StopIteration:
+                print(file)
+                raise ValueError("cl: File is empty or not formatted correctly.")
+            # cl = np.append(cl, float(next(f).split()[0]))
+            try:
+                cd = np.append(cd, float(next(f).split()[0]))
+            except StopIteration:
+                print(file)
+                raise ValueError("cd: File is empty or not formatted correctly.")
+            # cd = np.append(cd, float(next(f).split()[0]))
 
 
     cl = np.array(cl)

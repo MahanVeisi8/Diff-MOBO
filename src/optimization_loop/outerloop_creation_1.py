@@ -20,8 +20,8 @@ from OpenFoam.Airfoil_simulation_1.ShapeToPerformance import shape_to_performanc
 # docker_mount_path = "/home/bardiya/projects/diffusion_air_manifolding/codes/creative-generativeai-diffusion/src/OpenFoam"
 # docker_mount_path = "/home/bardiya/projects/diffusion_air_manifolding/codes/Airfoil_MPI_system"
 docker_mount_path = "src/OpenFoam"
-NUM_TO_GENERATE = 300
-BATCH_SIZE = 128
+NUM_TO_GENERATE = 1000
+BATCH_SIZE = 256
 # NUM_TO_GENERATE = 2
 # BATCH_SIZE = 2
 docker_container_id = "60cd59b630d7" 
