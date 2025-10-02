@@ -1,0 +1,20 @@
+process:
+  iterations: 2
+  number_of_cores: 2   #  really important for running on cpu
+
+docker_setup:
+  docker_mount_path: "../../OpenFoam"
+  docker_container_id: "f897792b6b56"  # make sure it has been started 
+
+model:
+  device : "cpu"
+  unet_checkpoint: "../../../src/diffusion_notebooks/DIffusion_model_weigths_and_datas/dpp_0.1_autonorm_true_125_from_base_ddpm/model_epoch_124.pt"
+
+sampling: 
+  number_to_generate : 5
+  batch_size : 5
+
+genetic_algorithm:
+  number_generations: 1
+  population_size: 5
+  from_DB_innerloop: True

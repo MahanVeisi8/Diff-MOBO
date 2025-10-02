@@ -6,3 +6,4 @@ einops
 denoising-diffusion-pytorch
 pymoo
 cython
+pyyaml

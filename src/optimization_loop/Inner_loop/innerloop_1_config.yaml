@@ -1,0 +1,6 @@
+model:
+  device : "cpu"
+  unet_checkpoint: "../../../src/diffusion_notebooks/DIffusion_model_weigths_and_datas/dpp_0.1_autonorm_true_125_from_base_ddpm/model_epoch_124.pt"
+sampling: 
+  number_to_generate : 5
+  batch_size : 5

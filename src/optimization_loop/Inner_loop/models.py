@@ -122,14 +122,14 @@ class UA_surrogate_model(nn.Module):
             if path_cd_models:
                 self.cd_forward_mlps[i].load_state_dict(torch.load(path_cd_models[i],map_location="cpu" ,weights_only=True))
     
-    def forward(self, x):
+    def forward(self, x , Eps = 1e-10):
         #################################################################################
         # Implement the forward pass computations                                 #
         #################################################################################
         
         each_line = []
         for i in range(len(self.cl_forward_mlps)):
-            each_line.append(torch.concat([self.cl_forward_mlps[i](x),self.cd_forward_mlps[i](x)],dim=1))
+            each_line.append(torch.concat([self.cl_forward_mlps[i](x),self.cl_forward_mlps[i](x) / (self.cd_forward_mlps[i](x) + Eps)],dim=1))
         
 
         return each_line
