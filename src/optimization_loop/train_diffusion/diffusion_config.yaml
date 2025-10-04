@@ -1,0 +1,51 @@
+diffusion_train:
+  device: "cuda"
+  EPOCHS: 1
+  LR : 0.001
+  NUM_WORKERS: 2
+  BATCH_SIZE : 1
+  VIS_EPOCHS : 1
+  MODEL_DIR : "src/optimization_loop/train_diffusion/weigths/Unet_weights"
+  LOG_DIR : "src/optimization_loop/train_diffusion/weigths/Unet_logs"
+  dpp_epoch_tres : -100
+  cash_dpp_loss : 0
+  LAMBDA_DPP : 0.1
+  LAMBDA_QUALITY : 0.5
+  DPP_WEIGTHS : [0.5,0.5]
+  Unet_starting_path : "src/diffusion_notebooks/DIffusion_model_weigths_and_datas/model_epoch_499_RMSnorm_unscaled.pt/model_epoch_499_RMSnorm_unscaled.pt"
+  
+data:
+  # for  diffusion training
+  # the name of the files inside the Base_DATA_DIR is needed  only 
+  BASE_DATA_DIR: "data"
+  xs_train_path: "xs_train.npy"
+  ys_train_path:  "ys_train.npy"
+  coord_min_max_path: "coord_min_max.npy"
+  label_min_max_path: "label_min_max.npy"
+  # for surrogate_model training
+
+
+
+surrogate_model:
+  cl_path: "src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/3_[150-200-200-150]/mlp_best_model.pt"
+  cd_path: "src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/3_[200-300-300-200]/mlp_best_model.pt"
+
+
+surrogate_train:
+  train_flag: True
+  device: "cuda"
+  input_size: 384
+  NUM_WORKERS:  2
+  BATCH_SIZE: 128
+  EPOCHS: 1
+  LR : 0.000001
+  hidden_layers_cd_model: [200,300,300,200]
+  hidden_layers_cl_model: [150,200,200,150]
+  cl_path: "src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/3_[150-200-200-150]/mlp_best_model.pt"
+  cd_path: "src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/3_[200-300-300-200]/mlp_best_model.pt"
+  patience: 100
+  MODEL_DIR : "src/optimization_loop/train_diffusion/weigths/surrogate_weigths"
+  LOG_DIR : "src/optimization_loop/train_diffusion/weigths/surrogate_logs"
+  LAMBDA_CD: 100
+  LAMBDA_CL: 1
+  

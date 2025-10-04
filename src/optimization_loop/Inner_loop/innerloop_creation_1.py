@@ -84,24 +84,6 @@ def init_generate_samples_latents(model ,diffusion, checkpoint_path, NUM_TO_GENE
     })
 
 
-"""
-    The main Hyperparams
-"""
-# device = "cpu"
-# NUM_TO_GENERATE = 5
-# BATCH_SIZE = 5
-# Unet_checkpoint_path = rf"../../../src/diffusion_notebooks/DIffusion_model_weigths_and_datas/dpp_0.1_autonorm_true_125_from_base_ddpm/model_epoch_124.pt"
-
-"""
-******************************
-******************************
-warning:
-    before running make sure to copy src/OpenFoam/Airfoil_simulation_1/OpenFOAM_0
-    in that folder 200 times with new directories name as src/OpenFoam/Airfoil_simulation_1/OpenFOAM_i for the i'th core ussage
-******************************
-******************************
-"""
-
 if __name__ == "__main__":
 
     # reading the yaml file

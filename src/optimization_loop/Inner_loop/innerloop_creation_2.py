@@ -36,48 +36,10 @@ from utils import  BO_surrogate_uncertainty
 import yaml
 
 
-
-# hyperparams
-device = "cpu"
-# device = "cuda"
-"""
-    The main Hyperparams
-"""
-iterations = 2
-num_cores = 2
-docker_mount_path = "../../OpenFoam"
-NUM_TO_GENERATE = 5
-BATCH_SIZE = 5
-docker_container_id = "f897792b6b56" 
-Unet_checkpoint_path = rf"../../../src/diffusion_notebooks/DIffusion_model_weigths_and_datas/dpp_0.1_autonorm_true_125_from_base_ddpm/model_epoch_124.pt"
-saving_path = rf"src/optimization_loop/Inner_loop/Database/DB_innerloop.npy"
-
-# Genetic  Algoorithm  Hyper params
-number_generations=1
-population_size=5
-from_DB_innerloop=True
-
-"""
-******************************
-******************************
-warning:
-    -   before running make sure to copy src/OpenFoam/Airfoil_simulation_1/OpenFOAM_0
-        in that folder 200 times with new directories name as src/OpenFoam/Airfoil_simulation_1/OpenFOAM_i for the i'th core ussage
-    -   first run the innerloop_creation_1.py first then this file   
-******************************
-******************************
-"""
-
-
-# funciton and important definitions
-DATA_DIR = Path(rf"../../../data")
-coord_mm = np.load(DATA_DIR/"coord_min_max.npy")  # [[x_min,y_min],[x_max,y_max]]
-x_min,y_min = coord_mm[0]; x_max,y_max = coord_mm[1]
-
 def inv_coords(xs_s):                   # xs_s shape (...,2,192) tensor
     xs_np = xs_s.permute(0,2,1).cpu().numpy()    # -> (B,192,2)
-    xs_np[...,0] = xs_np[...,0]*(x_max-x_min) + x_min
-    xs_np[...,1] = xs_np[...,1]*(y_max-y_min) + y_min
+    # xs_np[...,0] = xs_np[...,0]*(x_max-x_min) + x_min
+    # xs_np[...,1] = xs_np[...,1]*(y_max-y_min) + y_min
     return xs_np                                # (B,192,2) numpy
 
 def init_generate_samples_latents(model ,diffusion, checkpoint_path, NUM_TO_GENERATE , BATCH_SIZE):
