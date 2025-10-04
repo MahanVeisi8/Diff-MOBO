@@ -83,11 +83,27 @@ def init_generate_samples_latents(model ,diffusion, checkpoint_path, NUM_TO_GENE
         "shapes": np.vstack(all_shapes),
     })
 
+import argparse
+
+# Create the argument parser
+parser = argparse.ArgumentParser(description="Example script with iteration argument")
+
+# Add the --iteration argument
+parser.add_argument(
+    "--iteration",
+    type=int,
+    required=True,       # Make it mandatory
+    help="Iteration number to run (e.g., --iteration 3)"
+)
+
+# Parse the arguments
+args = parser.parse_args()
+iter = args.iteration
 
 if __name__ == "__main__":
 
     # reading the yaml file
-    with open("innerloop_1_config.yaml", "r") as file:
+    with open("innerloop_config.yaml", "r") as file:
         config = yaml.safe_load(file)  # Converts YAML → Python dict
     # """
     # The main Hyperparams
@@ -113,6 +129,7 @@ if __name__ == "__main__":
         timesteps=1000,
         auto_normalize=False
     ).to(device)  # or .to(device)
+    
     init_generate_samples_latents(Unet_model , 
                                     diffusion , 
                                     NUM_TO_GENERATE=NUM_TO_GENERATE,

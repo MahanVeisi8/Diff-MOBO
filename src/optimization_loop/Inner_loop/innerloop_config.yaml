@@ -1,0 +1,33 @@
+process:
+  iterations: 30
+  number_of_cores: 2   #  really important for running on cpu
+
+docker_setup:
+  docker_mount_path: "../../OpenFoam"
+  docker_container_id: "f897792b6b56"  # make sure it has been started 
+
+model:
+  device : "cuda"
+  unet_checkpoint: "../../../src/diffusion_notebooks/DIffusion_model_weigths_and_datas/dpp_0.1_autonorm_true_125_from_base_ddpm/model_epoch_124.pt"
+
+sampling: 
+  number_to_generate : 1000
+  batch_size : 128
+
+UA_surrogate_model:
+  init_cl_0_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/0_[150-200-200-150]/mlp_best_model.pt"
+  init_cl_2_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/2_[150-200-200-150]/mlp_best_model.pt"
+  init_cl_3_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/3_[150-200-200-150]/mlp_best_model.pt"
+  init_cl_4_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/4_[100-300-300-100]/mlp_best_model.pt"
+
+  init_cd_0_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/0_[200-300-300-200]/mlp_best_model.pt"
+  init_cd_2_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/2_[200-300-300-200]/mlp_best_model.pt"
+  init_cd_3_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/3_[200-300-300-200]/mlp_best_model.pt"
+  init_cd_4_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/4_[200-300-300-200]/mlp_best_model.pt"
+
+  saved_update_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/updated/UA_surrogate_model_4.pt"
+
+genetic_algorithm:
+  number_generations: 100
+  population_size: 1000
+  from_DB_innerloop: True

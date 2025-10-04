@@ -1,10 +1,10 @@
 diffusion_train:
   device: "cuda"
-  EPOCHS: 1
+  EPOCHS: 125
   LR : 0.001
   NUM_WORKERS: 2
-  BATCH_SIZE : 1
-  VIS_EPOCHS : 1
+  BATCH_SIZE : 128
+  VIS_EPOCHS : 25
   MODEL_DIR : "src/optimization_loop/train_diffusion/weigths/Unet_weights"
   LOG_DIR : "src/optimization_loop/train_diffusion/weigths/Unet_logs"
   dpp_epoch_tres : -100
@@ -37,7 +37,7 @@ surrogate_train:
   input_size: 384
   NUM_WORKERS:  2
   BATCH_SIZE: 128
-  EPOCHS: 1
+  EPOCHS: 40
   LR : 0.000001
   hidden_layers_cd_model: [200,300,300,200]
   hidden_layers_cl_model: [150,200,200,150]

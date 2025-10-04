@@ -1,0 +1,1 @@
+python3 src/optimization_loop/train_diffusion/train_diffusion.py

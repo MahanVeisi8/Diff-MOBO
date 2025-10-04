@@ -34,7 +34,6 @@ from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.optimize import minimize
 from utils import  BO_surrogate_uncertainty
 import yaml
-from models import UA_surrogate_model
 
 
 def inv_coords(xs_s):                   # xs_s shape (...,2,192) tensor
@@ -84,7 +83,7 @@ def init_generate_samples_latents(model ,diffusion, checkpoint_path, NUM_TO_GENE
         "shapes": np.vstack(all_shapes),
     })
 
-def GEN_UA(config,diffusion,device ,num_cores, number_iter = 0,number_generations=100 , population_size = 1000 , from_DB_innerloop = True):
+def GEN_UA(diffusion,device ,num_cores, number_iter = 0,number_generations=100 , population_size = 1000 , from_DB_innerloop = True):
     # n_iter = 2
     print('calculating surrogate pareto ...')
     if from_DB_innerloop:
@@ -93,27 +92,6 @@ def GEN_UA(config,diffusion,device ,num_cores, number_iter = 0,number_generation
         
         print(full_samples.shape)
     problem_uncertainty = BO_surrogate_uncertainty(diffusion = diffusion,device=device,num_cores=num_cores,n_iter=number_iter)
-    
-    if number_iter == 0:
-        # if its iteration 0 then loading  the weigths  from the init weigths
-        problem_uncertainty.UA_surrogate_model = UA_surrogate_model(
-            path_cl_models=[
-                config["UA_surrogate_model"]["init_cl_0_path"],
-                config["UA_surrogate_model"]["init_cl_2_path"],
-                config["UA_surrogate_model"]["init_cl_3_path"],
-                config["UA_surrogate_model"]["init_cl_4_path"]
-            ],
-            path_cd_models=[
-                config["UA_surrogate_model"]["init_cd_0_path"],
-                config["UA_surrogate_model"]["init_cd_2_path"],
-                config["UA_surrogate_model"]["init_cd_3_path"],
-                config["UA_surrogate_model"]["init_cd_4_path"]
-            ]
-        )
-    else:
-        # else loading from the checkpoint and updated weigths (all the weights are there and its  easier to track it)
-        problem_uncertainty.UA_surrogate_model.load_state_dict(torch.load(config["UA_surrogate_model"]["saved_update_path"],weights_only=True))
-
     algorithm = NSGA2(pop_size=population_size)
     res = minimize(problem_uncertainty,
                 algorithm,
@@ -368,25 +346,6 @@ if __name__== "__main__":
         auto_normalize=False
     ).to(device)  # or .to(device)
 
-    print(f"iteration: {iter}")
-    # Stage 1:
-    print("Stage 1")   # Need GPU
-    NSGA_BO_surrogate_modules = GEN_UA(config = config,
-                                diffusion=diffusion, 
-                                device=device,
-                                number_iter=iter,
-                                num_cores = num_cores, 
-                                number_generations=number_generations, 
-                                population_size=population_size,
-                                from_DB_innerloop=True)
-
-    # Stage 2:
-    print("Stage 2")  # Need GPU
-    NSGA_latent_to_shape(Unet_model , 
-                diffusion , 
-                num_cores,
-                BATCH_SIZE=BATCH_SIZE,
-                checkpoint_path=Unet_checkpoint_path,
-                docker_mount_path=docker_mount_path
-                )
-
+    # Stage 3 (first  start it):
+    print("Stage 3")  # *******ONLY NEED DOCKER AND OPENFOAM******
+    CFD_simulation(docker_container_id=docker_container_id)

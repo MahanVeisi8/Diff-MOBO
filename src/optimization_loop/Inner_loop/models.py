@@ -94,18 +94,20 @@ class UA_surrogate_model(nn.Module):
                 ], 
                 net_n_cl= [0,2,3,4], 
                 net_n_cd= [0,2,3,4], 
-                path_cl_models  = [
-                rf"UA_surrogate_weights/cl/0_[150-200-200-150]/mlp_best_model.pt",
-                rf"UA_surrogate_weights/cl/2_[150-200-200-150]/mlp_best_model.pt",
-                rf"UA_surrogate_weights/cl/3_[150-200-200-150]/mlp_best_model.pt",
-                rf"UA_surrogate_weights/cl/4_[100-300-300-100]/mlp_best_model.pt"
-                ], 
-                path_cd_models = [
-                    rf"UA_surrogate_weights/cd/0_[200-300-300-200]/mlp_best_model.pt",
-                    rf"UA_surrogate_weights/cd/2_[200-300-300-200]/mlp_best_model.pt",
-                    rf"UA_surrogate_weights/cd/3_[200-300-300-200]/mlp_best_model.pt",
-                    rf"UA_surrogate_weights/cd/4_[200-300-300-200]/mlp_best_model.pt"
-                ],
+                path_cl_models =None, 
+                path_cd_models =None
+                # path_cl_models  = [
+                # rf"UA_surrogate_weights/cl/0_[150-200-200-150]/mlp_best_model.pt",
+                # rf"UA_surrogate_weights/cl/2_[150-200-200-150]/mlp_best_model.pt",
+                # rf"UA_surrogate_weights/cl/3_[150-200-200-150]/mlp_best_model.pt",
+                # rf"UA_surrogate_weights/cl/4_[100-300-300-100]/mlp_best_model.pt"
+                # ], 
+                # path_cd_models = [
+                #     rf"UA_surrogate_weights/cd/0_[200-300-300-200]/mlp_best_model.pt",
+                #     rf"UA_surrogate_weights/cd/2_[200-300-300-200]/mlp_best_model.pt",
+                #     rf"UA_surrogate_weights/cd/3_[200-300-300-200]/mlp_best_model.pt",
+                #     rf"UA_surrogate_weights/cd/4_[200-300-300-200]/mlp_best_model.pt"
+                # ],
                 ):
         super(UA_surrogate_model,self).__init__()
         self.cl_forward_mlps = nn.ModuleList()
