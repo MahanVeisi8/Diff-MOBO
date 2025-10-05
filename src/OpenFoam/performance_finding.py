@@ -21,6 +21,7 @@ while done < total_shapes:
     batch = airfoil_shape[done:done+cur , :,:]
     performance = STP1(batch)
     print(performance)
+    performance[:2] = performance[:2] + done
     all_performances.append(performance)
     done += cur
 np.save("performance.npy" , np.vstack(all_performances))
