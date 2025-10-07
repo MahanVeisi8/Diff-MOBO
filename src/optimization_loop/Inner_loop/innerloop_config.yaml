@@ -1,6 +1,6 @@
 process:
   iterations: 30
-  number_of_cores: 2   #  really important for running on cpu
+  number_of_cores: 200   #  really important for running on cpu
   checkpoint_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/updated"
 
 docker_setup:

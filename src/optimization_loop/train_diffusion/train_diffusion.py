@@ -194,9 +194,9 @@ def train_diffusion_model(config):
         timesteps  = 1000,
         auto_normalize = True
     ).to(device)
-    # if we  updated the surrogates, then we should use their weigths, if not the weigths we provide to the yaml file
-    path_cd_model= os.path.join(config["surrogate_train"]["MODEL_DIR"],"best_cd_model.pt") if config["surrogate_train"]["train_flag"] == True else config["surrogate_model"]["cd_path"]
-    path_cl_model= os.path.join(config["surrogate_train"]["MODEL_DIR"],"best_cl_model.pt") if config["surrogate_train"]["train_flag"] == True else config["surrogate_model"]["cl_path"]
+    # # if we  updated the surrogates, then we should use their weigths, if not the weigths we provide to the yaml file
+    # path_cd_model= os.path.join(config["surrogate_train"]["MODEL_DIR"],"best_cd_model.pt") if config["surrogate_train"]["train_flag"] == True else config["surrogate_model"]["cd_path"]
+    # path_cl_model= os.path.join(config["surrogate_train"]["MODEL_DIR"],"best_cl_model.pt") if config["surrogate_train"]["train_flag"] == True else config["surrogate_model"]["cl_path"]
     
     # surrogate_model = Hybrid_surrogate_MLP(input_size=192 * 2, 
     #                                 hidden_layers_cd_model=[200,300,300,200],

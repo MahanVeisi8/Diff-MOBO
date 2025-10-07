@@ -2,7 +2,7 @@ diffusion_train:
   device: "cuda"
   EPOCHS: 125
   LR : 0.001
-  NUM_WORKERS: 2
+  NUM_WORKERS: 199
   BATCH_SIZE : 128
   VIS_EPOCHS : 25
   MODEL_DIR : "src/optimization_loop/train_diffusion/weigths/Unet_weights"
@@ -54,7 +54,7 @@ surrogate_train:
   train_flag: True
   device: "cuda"
   input_size: 384
-  NUM_WORKERS:  2
+  NUM_WORKERS:  199
   BATCH_SIZE: 128
   EPOCHS: 40
   LR : 0.000001

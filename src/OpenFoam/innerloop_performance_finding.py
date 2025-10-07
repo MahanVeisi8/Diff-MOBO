@@ -7,7 +7,7 @@ from Airfoil_simulation_3.ShapeToPerformance import shape_to_performance as STP3
 import argparse
 import os,sys
 
-NUM_CORES = 2
+NUM_CORES = 200
 
 DB = np.load(rf"DB_CFD.npy",allow_pickle=True).item()
 airfoil_shape = DB["shapes"]
