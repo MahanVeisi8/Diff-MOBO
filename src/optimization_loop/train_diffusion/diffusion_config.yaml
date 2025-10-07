@@ -3,7 +3,7 @@ diffusion_train:
   EPOCHS: 125
   LR : 0.001
   NUM_WORKERS: 2
-  BATCH_SIZE : 1
+  BATCH_SIZE : 128
   VIS_EPOCHS : 25
   MODEL_DIR : "src/optimization_loop/train_diffusion/weigths/Unet_weights"
   LOG_DIR : "src/optimization_loop/train_diffusion/weigths/Unet_logs"

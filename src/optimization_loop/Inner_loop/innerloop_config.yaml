@@ -12,7 +12,7 @@ model:
   unet_checkpoint: "../../../src/diffusion_notebooks/DIffusion_model_weigths_and_datas/dpp_0.1_autonorm_true_125_from_base_ddpm/model_epoch_124.pt"
 
 sampling: 
-  number_to_generate : 4
+  number_to_generate : 1000
   batch_size : 128
 
 UA_surrogate_model:
@@ -38,6 +38,6 @@ UA_surrogate_model:
   saved_update_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/updated/UA_surrogate_model_8_channel.pt"
 
 genetic_algorithm:
-  number_generations: 1
-  population_size: 5
+  number_generations: 100
+  population_size: 1000
   from_DB_innerloop: True
