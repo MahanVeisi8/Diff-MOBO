@@ -84,16 +84,24 @@ class UA_surrogate_model(nn.Module):
                 [150,200,200,150],
                 [150,200,200,150],
                 [150,200,200,150],
-                [100,300,300,100],
+                [150,200,200,150],
+                [150,200,200,150],
+                [150,200,200,150],
+                [150,200,200,150],
+                [150,200,200,150]
                 ],
                 hidden_layers_cd_models = [
                 [200,300,300,200],
                 [200,300,300,200],
                 [200,300,300,200],
                 [200,300,300,200],
+                [200,300,300,200],
+                [200,300,300,200],
+                [200,300,300,200],
+                [200,300,300,200]
                 ], 
-                net_n_cl= [0,2,3,4], 
-                net_n_cd= [0,2,3,4], 
+                net_n_cl= [0,2,3,4,0,2,3,4], 
+                net_n_cd= [0,2,3,4,0,2,3,4], 
                 path_cl_models =None, 
                 path_cd_models =None
                 # path_cl_models  = [
@@ -112,7 +120,7 @@ class UA_surrogate_model(nn.Module):
         super(UA_surrogate_model,self).__init__()
         self.cl_forward_mlps = nn.ModuleList()
         self.cd_forward_mlps = nn.ModuleList()
-        for i in range(4):
+        for i in range(len(net_n_cl)):
             self.cl_forward_mlps.append(
                 MultiLayerPerceptron_forward(input_size , hidden_layers_cl_models[i] ,   num_classes=1  , net_n=net_n_cl[i])
             )
@@ -135,10 +143,26 @@ class UA_surrogate_model(nn.Module):
         
 
         return each_line
+    
+    def get_cl_cd(self,x):
+        cl = []
+        cd = []
+        for i in range(len(self.cl_forward_mlps)):
+            cl.append(self.cl_forward_mlps[i](x))
+            cd.append(self.cd_forward_mlps[i](x))
+        cl =torch.stack(cl,dim=0)
+        cd = torch.stack(cd,dim=0)
+        # print(f"{cl.shape=}")
+        # print(f"{cd.shape=}")
+        ans = torch.concat([cl,cd],dim=-1)
+        # print(f"{ans.shape=}")
+        reproduced_Performance_mu = (1 / len(self.cl_forward_mlps)) * torch.sum(ans, dim=0)
+        # print(f"{reproduced_Performance_mu.shape=}")
+        return reproduced_Performance_mu
 
 
 if __name__  == "__main__":
     model = UA_surrogate_model()
     x = torch.zeros((2,384))
-    out = model(x)
+    out = model.get_cl_cd(x)
     print(out)

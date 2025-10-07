@@ -8,14 +8,13 @@ from tqdm import tqdm
 sys.path.append("..")
 sys.path.append("../..")
 sys.path.append("../../..")
-sys.path.append("..")
-sys.path.append("../..")
 sys.path.append("src/")
 sys.path.append("src/OpenFoam")
 sys.path.append("src/diffusion_notebooks")
 sys.path.append("data/")
 sys.path.append(os.path.abspath(".."))
 sys.path.append(os.path.abspath("../.."))
+sys.path.append(os.path.abspath("../../.."))
 from diffusion_core.diffusion import GaussianDiffusion1D
 from diffusion_core.model import Unet1D
 from pathlib import Path

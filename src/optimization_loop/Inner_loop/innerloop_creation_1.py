@@ -16,6 +16,7 @@ sys.path.append("src/diffusion_notebooks")
 sys.path.append("data/")
 sys.path.append(os.path.abspath(".."))
 sys.path.append(os.path.abspath("../.."))
+sys.path.append(os.path.abspath("../../.."))
 from diffusion_core.diffusion import GaussianDiffusion1D
 from diffusion_core.model import Unet1D
 from pathlib import Path
@@ -31,15 +32,15 @@ import torch.nn as nn
 import torch.optim as optim
 import yaml
 
-DATA_DIR = Path(rf"../../../data")
-coord_mm = np.load(DATA_DIR/"coord_min_max.npy")  # [[x_min,y_min],[x_max,y_max]]
-x_min,y_min = coord_mm[0]; x_max,y_max = coord_mm[1]
-print(x_min,y_min)
+# DATA_DIR = Path(rf"../../../data")
+# coord_mm = np.load(DATA_DIR/"coord_min_max.npy")  # [[x_min,y_min],[x_max,y_max]]
+# x_min,y_min = coord_mm[0]; x_max,y_max = coord_mm[1]
+# print(x_min,y_min)
 
 def inv_coords(xs_s):                   # xs_s shape (...,2,192) tensor
     xs_np = xs_s.permute(0,2,1).cpu().numpy()    # -> (B,192,2)
-    xs_np[...,0] = xs_np[...,0]*(x_max-x_min) + x_min
-    xs_np[...,1] = xs_np[...,1]*(y_max-y_min) + y_min
+    # xs_np[...,0] = xs_np[...,0]*(x_max-x_min) + x_min
+    # xs_np[...,1] = xs_np[...,1]*(y_max-y_min) + y_min
     return xs_np                                # (B,192,2) numpy
 
 def init_generate_samples_latents(model ,diffusion, checkpoint_path, NUM_TO_GENERATE , BATCH_SIZE):

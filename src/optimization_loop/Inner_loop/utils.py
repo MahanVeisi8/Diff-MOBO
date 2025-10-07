@@ -13,7 +13,7 @@ coord_mm = np.load(DATA_DIR/"coord_min_max.npy")  # [[x_min,y_min],[x_max,y_max]
 x_min,y_min = coord_mm[0]; x_max,y_max = coord_mm[1]
 
 class BO_surrogate_uncertainty(Problem):
-    def __init__(self,diffusion,num_cores=2, device = "cpu" ,n_iter=0 ):
+    def __init__(self,diffusion,num_cores=2, device = "cuda" ,n_iter=0 ):
         super().__init__(n_var=384, n_obj=4, xl=0, xu=1)
         
         # setting up the diffusion models for getting designs out of latents
@@ -35,7 +35,7 @@ class BO_surrogate_uncertainty(Problem):
         #     mu_model.eval()
         #     self.mu_models.append(mu_model)
 
-        self.UA_surrogate_model = UA_surrogate_model()
+        self.UA_surrogate_model = UA_surrogate_model().to(self.device)
         self.UA_surrogate_model.eval()
         # # if we need outo classifier
         # self.classifier_model = MultiLayerPerceptron_forward_classifier(input_size, hidden_size_mu, self.num_classes)
@@ -56,8 +56,8 @@ class BO_surrogate_uncertainty(Problem):
         reproduced_Performance_mu = torch.empty(batchsize, self.num_classes)
         uncertainty_epistemic = torch.empty((batchsize, self.num_classes))
 
-        out_list = self.UA_surrogate_model(designs.reshape(batchsize, -1))
-        reproduced_Performance_ensemble = torch.stack(out_list,dim=0)
+        out_list = self.UA_surrogate_model(designs.reshape(batchsize, -1).to(self.device))
+        reproduced_Performance_ensemble = torch.stack(out_list,dim=0).to("cpu")
 
         # calculating the mean  and  epistemic variance
         reproduced_Performance_mu = (1 / 10) * torch.sum(reproduced_Performance_ensemble, 0)
@@ -80,7 +80,7 @@ class BO_surrogate_uncertainty(Problem):
         Uses DataLoader for CPU batching and optional parallelism.
         """
         if isinstance(latents, np.ndarray):
-            latents = torch.from_numpy(latents).float()
+            latents = torch.from_numpy(latents).float().to(self.device)
         device = self.device
         num_to_generate = len(latents)
         batch_size      = BATCH_SIZE
@@ -98,7 +98,7 @@ class BO_surrogate_uncertainty(Problem):
             print(f"Processed { (i+1)*batch_size } / { len(latents) } latents")
 
         # Stack all outputs
-        return torch.from_numpy(np.vstack(all_shapes))
+        return torch.from_numpy(np.vstack(all_shapes)).to("cpu")
 
     def inv_coords(self, xs_s):                     # xs_s shape (...,2,192) tensor
         xs_np = xs_s.permute(0,2,1).cpu().numpy()   # -> (B,192,2)

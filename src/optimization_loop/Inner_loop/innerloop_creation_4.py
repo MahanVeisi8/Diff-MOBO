@@ -8,14 +8,13 @@ from tqdm import tqdm
 sys.path.append("..")
 sys.path.append("../..")
 sys.path.append("../../..")
-sys.path.append("..")
-sys.path.append("../..")
 sys.path.append("src/")
 sys.path.append("src/OpenFoam")
 sys.path.append("src/diffusion_notebooks")
 sys.path.append("data/")
 sys.path.append(os.path.abspath(".."))
 sys.path.append(os.path.abspath("../.."))
+sys.path.append(os.path.abspath("../../.."))
 from diffusion_core.diffusion import GaussianDiffusion1D
 from diffusion_core.model import Unet1D
 from pathlib import Path
@@ -222,7 +221,7 @@ def Tagging_phase(docker_mount_path, iteration  = 0):
     
     print(f"saving the valids and invalids in Database")
 
-def Retraining_UA_modules(model , checkpoint_path ,num_cores, batch_size = 128,epoches = 20,patience=5,lr = 1e-6 , iteration = 0):
+def Retraining_UA_modules(model ,device, checkpoint_path ,num_cores, batch_size = 128,epoches = 20,patience=5,lr = 1e-6 , iteration = 0):
     DB_valids = np.load(os.path.join("Database", f"DB_valids_iter_{iteration}.npy"),allow_pickle=True).item()
     if len(DB_valids["shapes"]) ==  0:
         print("No valid samples for this iteration passing the retraining ...")
@@ -251,10 +250,7 @@ def Retraining_UA_modules(model , checkpoint_path ,num_cores, batch_size = 128,e
             x, y = x.to(device), y.to(device)
 
             # forward
-            preds = model(x)[:,]
-            preds = torch.stack(preds,dim=0)
-            preds = torch.mean(preds,dim=0) # (batch , 2) -> cl , cl/cd
-            preds[:,1] = preds[:,0] / (preds[:,1] + 1e-10) # (batch , 2) -> cl , cd
+            preds = model.get_cl_cd(x)
             loss = criterion(preds, y)
 
             # backward
@@ -352,7 +348,8 @@ if __name__== "__main__":
 
     # Stage 5: (retraining the UA_surrogate models [and possibly the constraint handler to])
     print("Stage 5") # Need GPU
-    checkpoint_path = "Retraining_modules"
+    checkpoint_path = config["process"]["checkpoint_path"]
+    
     problem_uncertainty = BO_surrogate_uncertainty(diffusion=diffusion, 
                                                          num_cores=num_cores,
                                                          device=device)
@@ -360,23 +357,34 @@ if __name__== "__main__":
         # if its iteration 0 then loading  the weigths  from the init weigths
         problem_uncertainty.UA_surrogate_model = UA_surrogate_model(
             path_cl_models=[
-                config["UA_surrogate_model"]["init_cl_0_path"],
-                config["UA_surrogate_model"]["init_cl_2_path"],
-                config["UA_surrogate_model"]["init_cl_3_path"],
-                config["UA_surrogate_model"]["init_cl_4_path"]
+                config["UA_surrogate_model"]["init_cl_0_0_path"],
+                config["UA_surrogate_model"]["init_cl_2_0_path"],
+                config["UA_surrogate_model"]["init_cl_3_0_path"],
+                config["UA_surrogate_model"]["init_cl_4_0_path"],
+                config["UA_surrogate_model"]["init_cl_0_1_path"],
+                config["UA_surrogate_model"]["init_cl_2_1_path"],
+                config["UA_surrogate_model"]["init_cl_3_1_path"],
+                config["UA_surrogate_model"]["init_cl_4_1_path"]
             ],
             path_cd_models=[
-                config["UA_surrogate_model"]["init_cd_0_path"],
-                config["UA_surrogate_model"]["init_cd_2_path"],
-                config["UA_surrogate_model"]["init_cd_3_path"],
-                config["UA_surrogate_model"]["init_cd_4_path"]
+                config["UA_surrogate_model"]["init_cd_0_0_path"],
+                config["UA_surrogate_model"]["init_cd_2_0_path"],
+                config["UA_surrogate_model"]["init_cd_3_0_path"],
+                config["UA_surrogate_model"]["init_cd_4_0_path"],
+                config["UA_surrogate_model"]["init_cd_0_1_path"],
+                config["UA_surrogate_model"]["init_cd_2_1_path"],
+                config["UA_surrogate_model"]["init_cd_3_1_path"],
+                config["UA_surrogate_model"]["init_cd_4_1_path"]
             ]
-        )
+        ).to(config["UA_surrogate_model"]["device"])
     else:
         # else loading from the checkpoint and updated weigths (all the weights are there and its  easier to track it)
         problem_uncertainty.UA_surrogate_model.load_state_dict(torch.load(config["UA_surrogate_model"]["saved_update_path"],weights_only=True))
+        problem_uncertainty.UA_surrogate_model = problem_uncertainty.UA_surrogate_model.to(config["UA_surrogate_model"]["device"])
+
 
     Retraining_UA_modules(iteration=iter,
+                          device=device,
                             num_cores=num_cores,
                             model=problem_uncertainty.UA_surrogate_model,
                             checkpoint_path=checkpoint_path)

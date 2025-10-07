@@ -16,6 +16,7 @@ sys.path.append("src/diffusion_notebooks")
 sys.path.append("data/")
 sys.path.append(os.path.abspath(".."))
 sys.path.append(os.path.abspath("../.."))
+sys.path.append(os.path.abspath("../../.."))
 from diffusion_core.diffusion import GaussianDiffusion1D
 from diffusion_core.model import Unet1D
 from pathlib import Path
@@ -98,21 +99,30 @@ def GEN_UA(config,diffusion,device ,num_cores, number_iter = 0,number_generation
         # if its iteration 0 then loading  the weigths  from the init weigths
         problem_uncertainty.UA_surrogate_model = UA_surrogate_model(
             path_cl_models=[
-                config["UA_surrogate_model"]["init_cl_0_path"],
-                config["UA_surrogate_model"]["init_cl_2_path"],
-                config["UA_surrogate_model"]["init_cl_3_path"],
-                config["UA_surrogate_model"]["init_cl_4_path"]
+                config["UA_surrogate_model"]["init_cl_0_0_path"],
+                config["UA_surrogate_model"]["init_cl_2_0_path"],
+                config["UA_surrogate_model"]["init_cl_3_0_path"],
+                config["UA_surrogate_model"]["init_cl_4_0_path"],
+                config["UA_surrogate_model"]["init_cl_0_1_path"],
+                config["UA_surrogate_model"]["init_cl_2_1_path"],
+                config["UA_surrogate_model"]["init_cl_3_1_path"],
+                config["UA_surrogate_model"]["init_cl_4_1_path"]
             ],
             path_cd_models=[
-                config["UA_surrogate_model"]["init_cd_0_path"],
-                config["UA_surrogate_model"]["init_cd_2_path"],
-                config["UA_surrogate_model"]["init_cd_3_path"],
-                config["UA_surrogate_model"]["init_cd_4_path"]
+                config["UA_surrogate_model"]["init_cd_0_0_path"],
+                config["UA_surrogate_model"]["init_cd_2_0_path"],
+                config["UA_surrogate_model"]["init_cd_3_0_path"],
+                config["UA_surrogate_model"]["init_cd_4_0_path"],
+                config["UA_surrogate_model"]["init_cd_0_1_path"],
+                config["UA_surrogate_model"]["init_cd_2_1_path"],
+                config["UA_surrogate_model"]["init_cd_3_1_path"],
+                config["UA_surrogate_model"]["init_cd_4_1_path"]
             ]
-        )
+        ).to(config["UA_surrogate_model"]["device"])
     else:
         # else loading from the checkpoint and updated weigths (all the weights are there and its  easier to track it)
         problem_uncertainty.UA_surrogate_model.load_state_dict(torch.load(config["UA_surrogate_model"]["saved_update_path"],weights_only=True))
+        problem_uncertainty.UA_surrogate_model = problem_uncertainty.UA_surrogate_model.to(config["UA_surrogate_model"]["device"])
 
     algorithm = NSGA2(pop_size=population_size)
     res = minimize(problem_uncertainty,
