@@ -24,6 +24,8 @@ and `Inner_loop` directories.
 
 # Running Procedures:
 The Link of the models and .pt and .npy file is in [Here](https://drive.google.com/drive/folders/1YMBxlG-IxpO_EQ71j8eP2Pcd2PpGexzR?dmr=1&ec=wgc-drive-globalnav-goto).
+Also before running make sure that the OpenFOAM changes on the `ShapeToPerformance.py` file in the `Airfoil_simulation_1`
+has not been set for the MPI clusters, please make sure that this file is the same as your edit.
 ## Stage1: Getting sudo access for running bash files
 
 ```sh
