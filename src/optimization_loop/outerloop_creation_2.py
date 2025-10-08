@@ -21,7 +21,6 @@ import pickle
 # docker_mount_path = "/home/bardiya/projects/diffusion_air_manifolding/codes/creative-generativeai-diffusion/src/OpenFoam"
 # docker_mount_path = "/home/bardiya/projects/diffusion_air_manifolding/codes/Airfoil_MPI_system"
 docker_mount_path = "src/OpenFoam"
-NUM_TO_GENERATE = 1000
 BATCH_SIZE = 256
 # NUM_TO_GENERATE = 2
 # BATCH_SIZE = 2

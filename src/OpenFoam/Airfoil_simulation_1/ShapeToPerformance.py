@@ -271,10 +271,10 @@ def shape_to_performance(airfoil_sample_train):
     cl = []
     # We want to append txt files
     files_list = [os.path.join(Data_path, f) for f in os.listdir(Data_path) if os.path.isfile(os.path.join(Data_path, f))]
-    # filter out empty txt files. empty files will cause stopiteration error below.
-    files_list = [f for f in files_list if os.path.getsize(f) > 0]
-    # files_num = [f for f in os.listdir(Data_path) if os.path.isfile(os.path.join(Data_path, f))]
-    files_num = [os.path.basename(f) for f in files_list]
+    # # # filter out empty txt files. empty files will cause stopiteration error below.
+    # # files_list = [f for f in files_list if os.path.getsize(f) > 0]
+    files_num = [f for f in os.listdir(Data_path) if os.path.isfile(os.path.join(Data_path, f))]
+    # # files_num = [os.path.basename(f) for f in files_list]
 
     files_list.sort()
     numbers_array = []
@@ -287,19 +287,14 @@ def shape_to_performance(airfoil_sample_train):
             
     
     for file in files_list:
-        with open(file) as f:               
-            try:
+        # Check if file is empty:
+        if os.path.getsize(file) == 0:
+            cl = np.append(cl, -2000)
+            cd = np.append(cd, 2000)
+        else:
+            with open(file) as f:               
                 cl = np.append(cl, float(next(f).split()[0]))
-            except StopIteration:
-                print(file)
-                raise ValueError("cl: File is empty or not formatted correctly.")
-            # cl = np.append(cl, float(next(f).split()[0]))
-            try:
                 cd = np.append(cd, float(next(f).split()[0]))
-            except StopIteration:
-                print(file)
-                raise ValueError("cd: File is empty or not formatted correctly.")
-            # cd = np.append(cd, float(next(f).split()[0]))
 
 
     cl = np.array(cl)
