@@ -17,24 +17,6 @@ sampling:
 
 UA_surrogate_model:
   device: "cuda"
-  init_cl_0_0_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/0_0_[150-200-200-150]/mlp_best_model.pt"
-  init_cl_2_0_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/2_0_[150-200-200-150]/mlp_best_model.pt"
-  init_cl_3_0_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/3_0_[150-200-200-150]/mlp_best_model.pt"
-  init_cl_4_0_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/4_0_[150-200-200-150]/mlp_best_model.pt"
-  init_cl_0_1_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/0_1_[150-200-200-150]/mlp_best_model.pt"
-  init_cl_2_1_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/2_1_[150-200-200-150]/mlp_best_model.pt"
-  init_cl_3_1_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/3_1_[150-200-200-150]/mlp_best_model.pt"
-  init_cl_4_1_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/4_1_[150-200-200-150]/mlp_best_model.pt"
-
-  init_cd_0_0_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/0_0_[200-300-300-200]/mlp_best_model.pt"
-  init_cd_2_0_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/2_0_[200-300-300-200]/mlp_best_model.pt"
-  init_cd_3_0_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/3_0_[200-300-300-200]/mlp_best_model.pt"
-  init_cd_4_0_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/4_0_[200-300-300-200]/mlp_best_model.pt"
-  init_cd_0_1_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/0_1_[200-300-300-200]/mlp_best_model.pt"
-  init_cd_2_1_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/2_1_[200-300-300-200]/mlp_best_model.pt"
-  init_cd_3_1_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/3_1_[200-300-300-200]/mlp_best_model.pt"
-  init_cd_4_1_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/4_1_[200-300-300-200]/mlp_best_model.pt"
-
   saved_update_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/updated/UA_surrogate_model_8_channel.pt"
 
 genetic_algorithm:

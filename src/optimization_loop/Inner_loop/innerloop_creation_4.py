@@ -91,6 +91,11 @@ def GEN_UA(diffusion,device ,num_cores, number_iter = 0,number_generations=100 ,
         
         print(full_samples.shape)
     problem_uncertainty = BO_surrogate_uncertainty(diffusion = diffusion,device=device,num_cores=num_cores,n_iter=number_iter)
+    if number_iter != 0:
+        # else loading from the checkpoint and updated weigths (all the weights are there and its  easier to track it)
+        problem_uncertainty.UA_surrogate_model.load_state_dict(torch.load(config["UA_surrogate_model"]["saved_update_path"],weights_only=True))
+        problem_uncertainty.UA_surrogate_model = problem_uncertainty.UA_surrogate_model.to(config["UA_surrogate_model"]["device"])
+
     algorithm = NSGA2(pop_size=population_size)
     res = minimize(problem_uncertainty,
                 algorithm,

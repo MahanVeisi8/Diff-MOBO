@@ -131,7 +131,43 @@ class UA_surrogate_model(nn.Module):
                 self.cl_forward_mlps[i].load_state_dict(torch.load(path_cl_models[i],map_location="cpu" ,weights_only=True))
             if path_cd_models:
                 self.cd_forward_mlps[i].load_state_dict(torch.load(path_cd_models[i],map_location="cpu" ,weights_only=True))
+        
+        self.init_weigths()
     
+    def init_weigths(self):
+        """
+            initializingthe weigths,
+            for relu  types: [1, 2, 3, 4] -> relubased -> kaiming init
+            for relu  types: [0] -> relubased -> xaier uniform init
+        """
+
+        def init_mlp_weights(mlp, activation_type):
+            # Map activation index to type name
+            # Adjust based on your activation_function_list
+            relu_like = [1, 2, 3, 4]   # ReLU-family activations
+            tanh_like = [0]                 # tanh-based activations
+
+            for layer in mlp.modules():
+                if isinstance(layer, nn.Linear):
+                    if activation_type in relu_like:
+                        nn.init.kaiming_uniform_(layer.weight, nonlinearity='relu')
+                    elif activation_type in tanh_like:
+                        nn.init.xavier_uniform_(layer.weight)
+                    else:
+                        # fallback to Xavier if unknown
+                        nn.init.xavier_uniform_(layer.weight)
+                    
+                    if layer.bias is not None:
+                        nn.init.zeros_(layer.bias)
+
+        # Initialize cl (lift coefficient) networks
+        for mlp, net_type in zip(self.cl_forward_mlps, self.net_n_cl):
+            init_mlp_weights(mlp, net_type)
+
+        # Initialize cd (drag coefficient) networks
+        for mlp, net_type in zip(self.cd_forward_mlps, self.net_n_cd):
+            init_mlp_weights(mlp, net_type)
+
     def forward(self, x , Eps = 1e-10):
         #################################################################################
         # Implement the forward pass computations                                 #
@@ -143,7 +179,7 @@ class UA_surrogate_model(nn.Module):
         
 
         return each_line
-    
+
     def get_cl_cd(self,x):
         cl = []
         cd = []

@@ -204,29 +204,13 @@ def train_diffusion_model(config):
     #                                 path_cd_model=path_cd_model,
     #                                 path_cl_model=path_cl_model
     #                                 ).to(device)
-    if config["UA_surrogate_model"]["all_weigths_path"] !=None:
-        surrogate_model = UA_surrogate_model(
-                path_cl_models=[
-                    config["UA_surrogate_model"]["init_cl_0_0_path"],
-                    config["UA_surrogate_model"]["init_cl_2_0_path"],
-                    config["UA_surrogate_model"]["init_cl_3_0_path"],
-                    config["UA_surrogate_model"]["init_cl_4_0_path"],
-                    config["UA_surrogate_model"]["init_cl_0_1_path"],
-                    config["UA_surrogate_model"]["init_cl_2_1_path"],
-                    config["UA_surrogate_model"]["init_cl_3_1_path"],
-                    config["UA_surrogate_model"]["init_cl_4_1_path"]
-                ],
-                path_cd_models=[
-                    config["UA_surrogate_model"]["init_cd_0_0_path"],
-                    config["UA_surrogate_model"]["init_cd_2_0_path"],
-                    config["UA_surrogate_model"]["init_cd_3_0_path"],
-                    config["UA_surrogate_model"]["init_cd_4_0_path"],
-                    config["UA_surrogate_model"]["init_cd_0_1_path"],
-                    config["UA_surrogate_model"]["init_cd_2_1_path"],
-                    config["UA_surrogate_model"]["init_cd_3_1_path"],
-                    config["UA_surrogate_model"]["init_cd_4_1_path"]
-                ]
-            ).to(device)
+    if config["UA_surrogate_model"]["all_weigths_path"] != None:
+        surrogate_model = Hybrid_surrogate_MLP(input_size=192 * 2, 
+                                 hidden_layers_cd_model=[200,300,300,200],
+                                 hidden_layers_cl_model=[150, 200,200,150],
+                                 path_cd_model=config["UA_surrogate_model"]["init_cd_path"],
+                                 path_cl_model=config["UA_surrogate_model"]["init_cl_path"]
+                                 ).to(device)
     else:
         surrogate_model = UA_surrogate_model()
         surrogate_model = surrogate_model.load_state_dict(torch.load(config["UA_surrogate_model"]["all_weigths_path"],weights_only=True))
@@ -404,28 +388,14 @@ def train_surrogate_model(config):
     #                                 path_cl_model=config["surrogate_train"]["cl_path"]
     #                                 ).to(device)
     if config["UA_surrogate_model"]["all_weigths_path"] !=None:
-        model_mlp = UA_surrogate_model(
-                path_cl_models=[
-                    config["UA_surrogate_model"]["init_cl_0_0_path"],
-                    config["UA_surrogate_model"]["init_cl_2_0_path"],
-                    config["UA_surrogate_model"]["init_cl_3_0_path"],
-                    config["UA_surrogate_model"]["init_cl_4_0_path"],
-                    config["UA_surrogate_model"]["init_cl_0_1_path"],
-                    config["UA_surrogate_model"]["init_cl_2_1_path"],
-                    config["UA_surrogate_model"]["init_cl_3_1_path"],
-                    config["UA_surrogate_model"]["init_cl_4_1_path"]
-                ],
-                path_cd_models=[
-                    config["UA_surrogate_model"]["init_cd_0_0_path"],
-                    config["UA_surrogate_model"]["init_cd_2_0_path"],
-                    config["UA_surrogate_model"]["init_cd_3_0_path"],
-                    config["UA_surrogate_model"]["init_cd_4_0_path"],
-                    config["UA_surrogate_model"]["init_cd_0_1_path"],
-                    config["UA_surrogate_model"]["init_cd_2_1_path"],
-                    config["UA_surrogate_model"]["init_cd_3_1_path"],
-                    config["UA_surrogate_model"]["init_cd_4_1_path"]
-                ]
-            ).to(device)
+        model_mlp = Hybrid_surrogate_MLP(input_size=192 * 2, 
+                                 hidden_layers_cd_model=[200,300,300,200],
+                                 hidden_layers_cl_model=[150, 200,200,150],
+                                 path_cd_model=config["UA_surrogate_model"]["init_cd_path"],
+                                 path_cl_model=config["UA_surrogate_model"]["init_cl_path"],
+                                 net_n_cd=3,
+                                 net_n_cl=3
+                                 ).to(device)
     else:
         model_mlp = UA_surrogate_model()
         model_mlp = model_mlp.load_state_dict(torch.load(config["UA_surrogate_model"]["all_weigths_path"],weights_only=True))
@@ -462,9 +432,10 @@ def train_surrogate_model(config):
             optimizer.zero_grad()
             outputs = model_mlp(features)  # shape (batch, 2)
             outputs *= 1000
-            labels[:,-1] *= 100000  #cd
+            # labels[:,-1] *= 1000  #cd
             labels[:,0] *= 1000   #cl
             loss = config["surrogate_train"]["LAMBDA_CD"] * criterion_train(outputs[:,1], labels[:,1]) #cd
+            # loss =0 
             loss += config["surrogate_train"]["LAMBDA_CL"] * criterion_train(outputs[:,0], labels[:,0])   #cl
             loss.backward()
             optimizer.step()
@@ -490,6 +461,7 @@ def train_surrogate_model(config):
                 # sys.exit()
                 test_loss += (criterion_val(preds[:,1], labels[:,1]) + 
                               criterion_val(preds[:,0], labels[:,0])).item() * features.size(0)
+                # test_loss += (criterion_val(preds[:,0], labels[:,0])).item() * features.size(0)
         epoch_test_loss = test_loss / len(test_loader.dataset)
         test_losses.append(epoch_test_loss)
 
@@ -554,10 +526,10 @@ if __name__ == "__main__":
     with open("src/optimization_loop/train_diffusion/diffusion_config.yaml", "r") as file:
         config = yaml.safe_load(file)  # Converts YAML → Python dict
 
-    # # Stage 1:  wheter if we need to update the surrogate model
-    # os.makedirs("src/optimization_loop/train_diffusion/weigths",exist_ok=True)
-    # print("Stage 1")
-    # train_surrogate_model(config)
+    # Stage 1:  wheter if we need to update the surrogate model
+    os.makedirs("src/optimization_loop/train_diffusion/weigths",exist_ok=True)
+    print("Stage 1")
+    train_surrogate_model(config)
     # Stage 2: updating the diffusion model
     print("Stage 1")
     train_diffusion_model(config)

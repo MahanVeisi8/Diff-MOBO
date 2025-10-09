@@ -95,31 +95,7 @@ def GEN_UA(config,diffusion,device ,num_cores, number_iter = 0,number_generation
         print(full_samples.shape)
     problem_uncertainty = BO_surrogate_uncertainty(diffusion = diffusion,device=device,num_cores=num_cores,n_iter=number_iter)
     
-    if number_iter == 0:
-        # if its iteration 0 then loading  the weigths  from the init weigths
-        problem_uncertainty.UA_surrogate_model = UA_surrogate_model(
-            path_cl_models=[
-                config["UA_surrogate_model"]["init_cl_0_0_path"],
-                config["UA_surrogate_model"]["init_cl_2_0_path"],
-                config["UA_surrogate_model"]["init_cl_3_0_path"],
-                config["UA_surrogate_model"]["init_cl_4_0_path"],
-                config["UA_surrogate_model"]["init_cl_0_1_path"],
-                config["UA_surrogate_model"]["init_cl_2_1_path"],
-                config["UA_surrogate_model"]["init_cl_3_1_path"],
-                config["UA_surrogate_model"]["init_cl_4_1_path"]
-            ],
-            path_cd_models=[
-                config["UA_surrogate_model"]["init_cd_0_0_path"],
-                config["UA_surrogate_model"]["init_cd_2_0_path"],
-                config["UA_surrogate_model"]["init_cd_3_0_path"],
-                config["UA_surrogate_model"]["init_cd_4_0_path"],
-                config["UA_surrogate_model"]["init_cd_0_1_path"],
-                config["UA_surrogate_model"]["init_cd_2_1_path"],
-                config["UA_surrogate_model"]["init_cd_3_1_path"],
-                config["UA_surrogate_model"]["init_cd_4_1_path"]
-            ]
-        ).to(config["UA_surrogate_model"]["device"])
-    else:
+    if number_iter != 0:
         # else loading from the checkpoint and updated weigths (all the weights are there and its  easier to track it)
         problem_uncertainty.UA_surrogate_model.load_state_dict(torch.load(config["UA_surrogate_model"]["saved_update_path"],weights_only=True))
         problem_uncertainty.UA_surrogate_model = problem_uncertainty.UA_surrogate_model.to(config["UA_surrogate_model"]["device"])

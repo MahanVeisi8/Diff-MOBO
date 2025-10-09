@@ -16,7 +16,10 @@ print(airfoil_shape.shape)
 total_shapes = len(airfoil_shape)
 done = 0
 all_performances = []
+l = 0
 while done < total_shapes:
+    if l> 5:
+        break
     cur = min(NUM_CORES, total_shapes - done)
     batch = airfoil_shape[done:done+cur , :,:]
     performance = STP1(batch)
@@ -24,5 +27,17 @@ while done < total_shapes:
     performance[:2] = performance[:2] + done
     all_performances.append(performance)
     done += cur
+    l += 1
+p = np.vstack(all_performances)
+print(p.shape)
+
+# Get indices that would sort the 3rd column (index 2)
+indices = np.argsort(p[:, 2], axis=0)
+print(indices)
+
+# Use those indices to reorder p
+p = p[indices]
+print(p)
+
 np.save("performance.npy" , np.vstack(all_performances))
 print("done!!!")
