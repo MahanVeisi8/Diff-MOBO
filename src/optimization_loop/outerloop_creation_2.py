@@ -24,7 +24,7 @@ docker_mount_path = "src/OpenFoam"
 BATCH_SIZE = 256
 # NUM_TO_GENERATE = 2
 # BATCH_SIZE = 2
-docker_container_id = "60cd59b630d7" 
+docker_container_id = "e14b8f8d728c" 
 saving_path = rf"src/optimization_loop/run_results.npy"
 # device = "cpu"
 device = "cuda"
@@ -77,7 +77,14 @@ if __name__ == "__main__":
     performance_path =os.path.join(docker_mount_path , rf"performance.npy")
     perfromance = np.load(performance_path,allow_pickle=True)
 
-    
+    # Performance is CL, CD, Index
+    # Results is a dict of (latent, shape, performance)
+    # Performance should sorted by index to match shapes and latents
+
+    # sort performance based on index, ascending
+    perfromance = sorted(perfromance, key=lambda x: x[2])  # sort by index
+    perfromance = np.array(perfromance)  # (N,3)
+
 
     np.save(saving_path, {
         "latents": all_latent,
