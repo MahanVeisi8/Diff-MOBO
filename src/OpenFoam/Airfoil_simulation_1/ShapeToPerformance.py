@@ -266,6 +266,7 @@ def shape_to_performance(airfoil_sample_train, airfoil_latent):
         p.join()
 
     Data_path = "./Airfoil_simulation_1/results/"
+    os.makedirs(Data_path, exist_ok=True)
     # num_files = len([name for name in os.listdir(Data_path) if os.path.isfile(os.path.join(Data_path, name))])
     cd = []
     cl = []
@@ -298,17 +299,17 @@ def shape_to_performance(airfoil_sample_train, airfoil_latent):
             with open(file) as f:               
                 cl = np.append(cl, float(next(f).split()[0]))
                 cd = np.append(cd, float(next(f).split()[0]))
-
-        latents.append(corresponding_latent)
-        shapes.append(corresponding_shape)
+        latents = np.append(latents, corresponding_latent)
+        # latents.append(corresponding_latent)
+        shapes = np.append(shapes, corresponding_shape)
+        # shapes.append(corresponding_shape)
 
     cl = np.array(cl)
     cd = np.array(cd)
     latents = np.array(latents)
     shapes = np.array(shapes)
     numbers_array = np.array(numbers_array)
-    print(numbers_array)
-
+    
     final = np.append(np.expand_dims(cl, axis=1), np.expand_dims(cd, axis=1), axis=1)
     final = np.append(final, np.expand_dims(numbers_array, axis=1), axis=1)
     

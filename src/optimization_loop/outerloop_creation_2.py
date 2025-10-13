@@ -58,7 +58,6 @@ if __name__ == "__main__":
     print("loading DB...")
     db2_path = os.path.join(docker_mount_path , "DB2.npy")
     data_dict = pickle.load(open(db2_path, "rb"))
-
     all_latent = data_dict['latents']
     all_shapes = data_dict['shapes']
 

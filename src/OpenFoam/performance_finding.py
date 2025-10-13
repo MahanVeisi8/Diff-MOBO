@@ -49,7 +49,6 @@ import pickle
 
 NUM_CORES = 200
 
-# # # DB2 = np.load(rf"DB2.npy",allow_pickle=True).items()
 with open("DB2.npy", "rb") as f:
     DB2 = pickle.load(f)
 airfoil_latent = DB2["latents"]
