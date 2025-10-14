@@ -149,7 +149,8 @@ def calculate_cd_cl(n, num_cores, airfoil_sample_train):
             print(CL)
             print(CD)
             continue
-            
+        
+        
         if runSim(fsX, fsY) != 0:
             print("\simulation failed, aborting")
             CL = -1000
@@ -166,7 +167,6 @@ def calculate_cd_cl(n, num_cores, airfoil_sample_train):
             CL, CD = readClCd()
             os.chdir("../..")
             # os.chdir("./Airfoil_simulation_1/OpenFOAM_%d/" % (n))
-
 
         # os.chdir("..")
         a_file = open("./Airfoil_simulation_1/results/%d.txt" % (sample_num), "w")
@@ -192,10 +192,15 @@ def calculate_cd_cl_res(n, sample_num, airfoil_sample_train):
     print("\tUsing len %5.3f angle %+5.3f " % (length, angle))
     print("\tResulting freestream vel x,y: {},{}".format(fsX, fsY))
 
+    # Make sure these exist. Without this, we skip to 
+    os.makedirs("./Airfoil_simulation_1/results/", exist_ok=True)
+    if not os.path.exists("./Airfoil_simulation_1/results/%d.txt" % (sample_num)):
+        with open("./Airfoil_simulation_1/results/%d.txt" % (sample_num), "w") as f:
+            pass
+
     os.chdir("./Airfoil_simulation_1/OpenFOAM_%d/" % (n))
 
     if genMesh(airfoil_sample_train[sample_num, :, :]) != 0:
-
         print("\tmesh generation failed, aborting")
         CL = -1000
         CD = 1000
@@ -205,9 +210,10 @@ def calculate_cd_cl_res(n, sample_num, airfoil_sample_train):
         a_file.close()
         print(CL)
         print(CD)
+
     
     print(os.getcwd())
-   
+    
     if runSim(fsX, fsY) != 0:
         print("\simulation failed, aborting")
         CL = -1000
@@ -224,7 +230,6 @@ def calculate_cd_cl_res(n, sample_num, airfoil_sample_train):
         os.chdir("../..")
         # os.chdir("./Airfoil_simulation_1/OpenFOAM_%d/" % (n))
 
-
     # os.chdir("..")
     a_file = open("./Airfoil_simulation_1/results/%d.txt" % (sample_num), "w")
     np.savetxt(a_file, np.array([CL, CD]), fmt="%f")
@@ -234,7 +239,7 @@ def calculate_cd_cl_res(n, sample_num, airfoil_sample_train):
 
 
 
-def shape_to_performance(airfoil_sample_train):
+def shape_to_performance(airfoil_sample_train, airfoil_latent):
     jobs = []
     num_cores = multiprocessing.cpu_count()
     print(num_cores)
@@ -264,6 +269,9 @@ def shape_to_performance(airfoil_sample_train):
     # num_files = len([name for name in os.listdir(Data_path) if os.path.isfile(os.path.join(Data_path, name))])
     cd = []
     cl = []
+    latents = []
+    shapes = []
+    # We want to append txt files
     files_list = [os.path.join(Data_path, f) for f in os.listdir(Data_path) if os.path.isfile(os.path.join(Data_path, f))]
     files_num = [f for f in os.listdir(Data_path) if os.path.isfile(os.path.join(Data_path, f))]
 
@@ -278,13 +286,26 @@ def shape_to_performance(airfoil_sample_train):
             
     
     for file in files_list:
-        with open(file) as f:
-            cl = np.append(cl, float(next(f).split()[0]))
-            cd = np.append(cd, float(next(f).split()[0]))
+        file_idx = int(file.split('/')[-1].split('.')[0])
+        corresponding_latent = airfoil_latent[file_idx]
+        corresponding_shape = airfoil_sample_train[file_idx]
 
+        # Check if file is empty:
+        if os.path.getsize(file) == 0:
+            cl = np.append(cl, -1000)
+            cd = np.append(cd, 1000)
+        else:
+            with open(file) as f:               
+                cl = np.append(cl, float(next(f).split()[0]))
+                cd = np.append(cd, float(next(f).split()[0]))
+
+        latents.append(corresponding_latent)
+        shapes.append(corresponding_shape)
 
     cl = np.array(cl)
     cd = np.array(cd)
+    latents = np.array(latents)
+    shapes = np.array(shapes)
     numbers_array = np.array(numbers_array)
     print(numbers_array)
 
@@ -296,6 +317,4 @@ def shape_to_performance(airfoil_sample_train):
     # Iterate through the list of files and remove each one
     for file in files:
         os.remove(os.path.join(Data_path, file))
-    return np.array(final)
-
-
+    return np.array(final), latents, shapes

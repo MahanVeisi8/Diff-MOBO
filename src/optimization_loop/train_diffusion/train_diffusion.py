@@ -432,7 +432,7 @@ def train_surrogate_model(config):
             optimizer.zero_grad()
             outputs = model_mlp(features)  # shape (batch, 2)
             outputs *= 1000
-            # labels[:,-1] *= 1000  #cd
+            labels[:,-1] *= 1000  #cd
             labels[:,0] *= 1000   #cl
             loss = config["surrogate_train"]["LAMBDA_CD"] * criterion_train(outputs[:,1], labels[:,1]) #cd
             # loss =0 

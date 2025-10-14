@@ -1,6 +1,6 @@
 process:
   iterations: 30
-  number_of_cores: 200   #  really important for running on cpu
+  number_of_cores: 2   #  really important for running on cpu
   checkpoint_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/updated"
 
 docker_setup:
@@ -12,14 +12,20 @@ model:
   unet_checkpoint: "../../../src/diffusion_notebooks/DIffusion_model_weigths_and_datas/dpp_0.1_autonorm_true_125_from_base_ddpm/model_epoch_124.pt"
 
 sampling: 
-  number_to_generate : 1000
-  batch_size : 128
+  number_to_generate : 4
+  batch_size : 4
 
 UA_surrogate_model:
   device: "cuda"
   saved_update_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/updated/UA_surrogate_model_8_channel.pt"
+  learning_rate: 0.000001
+  batch_size: 128
+  epoches: 200
+  patience: 50
+  LAMBDA_CL: 1
+  LAMBDA_CD: 100
 
 genetic_algorithm:
-  number_generations: 100
-  population_size: 1000
+  number_generations: 1
+  population_size: 4
   from_DB_innerloop: True

@@ -117,6 +117,8 @@ class UA_surrogate_model(nn.Module):
                 #     rf"UA_surrogate_weights/cd/4_[200-300-300-200]/mlp_best_model.pt"
                 # ],
                 ):
+        self.net_n_cl = net_n_cl
+        self.net_n_cd = net_n_cd
         super(UA_surrogate_model,self).__init__()
         self.cl_forward_mlps = nn.ModuleList()
         self.cd_forward_mlps = nn.ModuleList()
