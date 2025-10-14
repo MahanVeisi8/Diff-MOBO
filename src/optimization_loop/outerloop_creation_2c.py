@@ -58,7 +58,7 @@ if __name__ == "__main__":
     print("loading DB...")
     db2_path = os.path.join(docker_mount_path , "xs_train.npy")
     all_shapes = np.load(db2_path)
-    all_shapes = all_shapes[:400]
+    all_shapes = all_shapes
     print('Total shapes: ', all_shapes.shape)
     all_latent = np.zeros((all_shapes.shape[0],2,192))  # dummy latents
 
