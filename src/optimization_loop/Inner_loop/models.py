@@ -10,43 +10,9 @@ sys.path.append("../../..")
 
 activation_function_list = [torch.tanh, nn.ReLU(), nn.CELU(), nn.LeakyReLU(), nn.ELU(), nn.Hardswish(),torch.tanh, nn.ReLU(), nn.CELU(), nn.LeakyReLU(), torch.tanh]
 
-class MultiLayerPerceptron_forward_classifier(nn.Module):
-    def __init__(self, input_size, hidden_layers, num_classes):
-        super(MultiLayerPerceptron_forward_classifier, self).__init__()
-        #################################################################################
-        # Initialize the modules required to implement the mlp with given layer   #
-        # configuration. input_size --> hidden_layers[0] --> hidden_layers[1] .... -->  #
-        # hidden_layers[-1] --> num_classes                                             #
-        #################################################################################
-        layers = []
-        layers.append(nn.Linear((input_size), (hidden_layers[0])))
-        # layers.append(nn.Linear((hidden_layers[0]), (hidden_layers[1])))
-        # layers.append(nn.Linear((hidden_layers[1]), (hidden_layers[2])))
-        for i in range(len(hidden_layers)-1):
-            layers.append(nn.Linear((hidden_layers[i]), (hidden_layers[i+1])))
-
-        layers.append(nn.Linear((hidden_layers[len(hidden_layers)-1]), (num_classes)))
-        self.layers = nn.Sequential(*layers)
-        self.hidden_size = hidden_layers
-    
-    def forward(self, x):
-        #################################################################################
-        # Implement the forward pass computations                                 #
-        #################################################################################
-
-        # x = F.relu(self.layers[0](x))
-        # x = F.relu(self.layers[1](x))
-        # x = F.relu(self.layers[2](x))
-        for i in range(len(self.hidden_size)):
-            x = F.relu(self.layers[i](x))
-        x = (self.layers[len(self.hidden_size)](x))
-        out = x
-        # out = F.sigmoid(x)
-        return out
-
-# class MultiLayerPerceptron_forward(nn.Module):
-#     def __init__(self, input_size, hidden_layers, num_classes, net_n):
-#         super(MultiLayerPerceptron_forward, self).__init__()
+# class MultiLayerPerceptron_forward_classifier(nn.Module):
+#     def __init__(self, input_size, hidden_layers, num_classes):
+#         super(MultiLayerPerceptron_forward_classifier, self).__init__()
 #         #################################################################################
 #         # Initialize the modules required to implement the mlp with given layer   #
 #         # configuration. input_size --> hidden_layers[0] --> hidden_layers[1] .... -->  #
@@ -54,23 +20,28 @@ class MultiLayerPerceptron_forward_classifier(nn.Module):
 #         #################################################################################
 #         layers = []
 #         layers.append(nn.Linear((input_size), (hidden_layers[0])))
+#         # layers.append(nn.Linear((hidden_layers[0]), (hidden_layers[1])))
+#         # layers.append(nn.Linear((hidden_layers[1]), (hidden_layers[2])))
 #         for i in range(len(hidden_layers)-1):
 #             layers.append(nn.Linear((hidden_layers[i]), (hidden_layers[i+1])))
 
 #         layers.append(nn.Linear((hidden_layers[len(hidden_layers)-1]), (num_classes)))
 #         self.layers = nn.Sequential(*layers)
-#         self.net_n = net_n
-#         self.hidden_layers = hidden_layers
+#         self.hidden_size = hidden_layers
+    
 #     def forward(self, x):
 #         #################################################################################
 #         # Implement the forward pass computations                                 #
 #         #################################################################################
-#         m = activation_function_list[self.net_n]
-#         for i in range(len(self.hidden_layers)):
-#             x = self.layers[i](x)
-#             x = m(x)
-#         x = (self.layers[len(self.hidden_layers)](x))
-#         out=x
+
+#         # x = F.relu(self.layers[0](x))
+#         # x = F.relu(self.layers[1](x))
+#         # x = F.relu(self.layers[2](x))
+#         for i in range(len(self.hidden_size)):
+#             x = F.relu(self.layers[i](x))
+#         x = (self.layers[len(self.hidden_size)](x))
+#         out = x
+#         # out = F.sigmoid(x)
 #         return out
 
 
@@ -108,7 +79,6 @@ class MultiLayerPerceptron_forward(nn.Module):
         # Output layer (no activation)
         x = self.layers[-1](x)
         return x
-
 
 class UA_surrogate_model(nn.Module):
     """

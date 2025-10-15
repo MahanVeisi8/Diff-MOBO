@@ -17,7 +17,7 @@ diffusion_train:
 data:
   # for  diffusion training
   # the name of the files inside the Base_DATA_DIR is needed  only 
-  BASE_DATA_DIR: "data"
+  BASE_DATA_DIR: "data_MPI"
   xs_train_path: "xs_train_MPI.npy"
   ys_train_path:  "ys_train_MPI.npy"
   coord_min_max_path: "coord_min_max.npy"
