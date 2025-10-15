@@ -246,8 +246,9 @@ def GEN_UA(config,problem_uncertainty:BO_surrogate_uncertainty,diffusion,device 
                 algorithm,
                 ('n_gen', number_generations),
                 seed=1,
-                verbose=False,
-                X = full_samples.reshape(full_samples.shape[0], -1)  if from_DB_innerloop else None)
+                verbose=False
+                # X = full_samples.reshape(full_samples.shape[0], -1)  if from_DB_innerloop else None
+                )
     Paretoset_uncertainty = res.X
     Out_surrogate_uncertainty = res.F
     # sio.savemat('surrogate_pareto/ParetoSet_test.mat' , {'ParetoSet': np.array(Paretoset_uncertainty)})
@@ -400,7 +401,7 @@ def Retraining_UA_modules(model,
                           batch_size=128,
                           epoches=200,
                           patience=50,
-                          lr=1e-6, 
+                          lr=1e-4, 
                           iteration=0,
                           LAMBDA_CL=1,
                           LAMBDA_CD=100):

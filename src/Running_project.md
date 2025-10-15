@@ -26,6 +26,9 @@ and `Inner_loop` directories.
 The Link of the models and .pt and .npy file is in [Here](https://drive.google.com/drive/folders/1YMBxlG-IxpO_EQ71j8eP2Pcd2PpGexzR?dmr=1&ec=wgc-drive-globalnav-goto).
 Also before running make sure that the OpenFOAM changes on the `ShapeToPerformance.py` file in the `Airfoil_simulation_1`
 has not been set for the MPI clusters, please make sure that this file is the same as your edit.
+For this branch, evverything is compelete and we don't need last phases codes.(I have already set then for this branch)
+## Stage0: Copy and  paste openFOAM_i
+For this stage, we hae to go to the `src/OpenFoam/Airfoil_simulation_1` and copy and paste `src/OpenFoam/Airfoil_simulation_1/OpenFOAM_i` directory for each number of CPU cores in the system. 
 ## Stage1: Getting sudo access for running bash files
 
 ```sh
@@ -40,16 +43,18 @@ the `src/optimization_loop/train_diffusion/weigths/` directory is for saving the
 The yaml file has the these parameters:
 We only need to set the inputs paths like:
 
--   `Unet_starting_path`: the path for the  diffusion model (for this only use the `model_epoch_499_RMSnorm_unscaled.pt`)
--   `BASE_DATA_DIR`: the path of the data director in the base root of the project
--   `xs_train_path`: the path of xs_train.npy  file in the BASE_DATA_DIR
--   `ys_train_path`:  the path of ys_train.npy  file in the BASE_DATA_DIR
--   `coord_min_max_path`: the path of coord_min_max.npy  file in the BASE_DATA_DIR
--   `label_min_max_path`: the path of label_min_max.npy  file in the BASE_DATA_DIR
+-   `Unet_starting_path`: the path for the  diffusion model (for this only use the `model_epoch_499_RMSnorm_unscaled.pt`from [Here](https://drive.google.com/drive/folders/1YMBxlG-IxpO_EQ71j8eP2Pcd2PpGexzR?dmr=1&ec=wgc-drive-globalnav-goto)).
+-   `BASE_DATA_DIR`: the path of the data director in the base root of the project.
+-   `xs_train_path`: the path of xs_train.npy  file in the BASE_DATA_DIR.
+-   `ys_train_path`:  the path of ys_train.npy  file in the BASE_DATA_DIR.
+-   `coord_min_max_path`: the path of coord_min_max.npy  file in the BASE_DATA_DIR.
+-   `label_min_max_path`: the path of label_min_max.npy  file in the BASE_DATA_DIR.
 -   The `init_cl_path`: for setting up each pipeline weigths for the surrogate_model for cl_weigthts.
 -   The `init_cd_path`: for setting up each pipeline weigths for the surrogate_model for cd_weigthts.
 -   `all_weigths_path`: the path for the weigths of Ensemble if all of them is ina .pt file.
 -   `number_of_cores`: number of cores for running the codes.
+
+After running, the produced U_net weigths should be used as input/initial weigths for `run_inner_loop.sh` file.
 
 ## Stage3. Training The Innerloop  procedure.
 The `run_inner_loop.sh` is responsible for running the codes of `src/optimization_loop/Inner_loop/innerloop_creation_i.py`. 
@@ -60,8 +65,8 @@ The yaml file `src/optimization_loop/Inner_loop/innerloop_config.yaml` is respon
 the things we have to set here is:
 But be carefull:
 **The path's here should start with `../../..`.**
--   `docker_container_id`: the id of the docker container  of the openfoam ( make sure it has been started before running!)
--   `unet_checkpoint`: the path of the diffusion model's weigth that has been trained in the first stage 
+-   `docker_container_id`: the id of the docker container  of the openfoam ( make sure it has been started before running!).
+-   `unet_checkpoint`: the path of the diffusion model's weigth that has been trained in the first stage.
 -   `[sampling][number_to_generate]`: how many number do we want to generate in the prestaging phases (typiically 1000).
 -   `[sampling][batch_size]`: for the prestaging phase, better be 128 or 256.
 -   `[process][num_cores]`: set the number of cores.

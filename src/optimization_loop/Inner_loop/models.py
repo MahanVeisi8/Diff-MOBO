@@ -44,34 +44,71 @@ class MultiLayerPerceptron_forward_classifier(nn.Module):
         # out = F.sigmoid(x)
         return out
 
-class MultiLayerPerceptron_forward(nn.Module):
-    def __init__(self, input_size, hidden_layers, num_classes, net_n):
-        super(MultiLayerPerceptron_forward, self).__init__()
-        #################################################################################
-        # Initialize the modules required to implement the mlp with given layer   #
-        # configuration. input_size --> hidden_layers[0] --> hidden_layers[1] .... -->  #
-        # hidden_layers[-1] --> num_classes                                             #
-        #################################################################################
-        layers = []
-        layers.append(nn.Linear((input_size), (hidden_layers[0])))
-        for i in range(len(hidden_layers)-1):
-            layers.append(nn.Linear((hidden_layers[i]), (hidden_layers[i+1])))
+# class MultiLayerPerceptron_forward(nn.Module):
+#     def __init__(self, input_size, hidden_layers, num_classes, net_n):
+#         super(MultiLayerPerceptron_forward, self).__init__()
+#         #################################################################################
+#         # Initialize the modules required to implement the mlp with given layer   #
+#         # configuration. input_size --> hidden_layers[0] --> hidden_layers[1] .... -->  #
+#         # hidden_layers[-1] --> num_classes                                             #
+#         #################################################################################
+#         layers = []
+#         layers.append(nn.Linear((input_size), (hidden_layers[0])))
+#         for i in range(len(hidden_layers)-1):
+#             layers.append(nn.Linear((hidden_layers[i]), (hidden_layers[i+1])))
 
-        layers.append(nn.Linear((hidden_layers[len(hidden_layers)-1]), (num_classes)))
-        self.layers = nn.Sequential(*layers)
+#         layers.append(nn.Linear((hidden_layers[len(hidden_layers)-1]), (num_classes)))
+#         self.layers = nn.Sequential(*layers)
+#         self.net_n = net_n
+#         self.hidden_layers = hidden_layers
+#     def forward(self, x):
+#         #################################################################################
+#         # Implement the forward pass computations                                 #
+#         #################################################################################
+#         m = activation_function_list[self.net_n]
+#         for i in range(len(self.hidden_layers)):
+#             x = self.layers[i](x)
+#             x = m(x)
+#         x = (self.layers[len(self.hidden_layers)](x))
+#         out=x
+#         return out
+
+
+class MultiLayerPerceptron_forward(nn.Module):
+    def __init__(self, input_size, hidden_layers, num_classes, net_n, dropout_prob=0.2):
+        super(MultiLayerPerceptron_forward, self).__init__()
+
+        self.layers = nn.ModuleList()
+        self.bns = nn.ModuleList()  # BatchNorm layers
+        self.dropout = nn.Dropout(p=dropout_prob)
         self.net_n = net_n
-        self.hidden_layers = hidden_layers
+
+        # Input layer
+        self.layers.append(nn.Linear(input_size, hidden_layers[0]))
+        self.bns.append(nn.BatchNorm1d(hidden_layers[0]))
+
+        # Hidden layers
+        for i in range(len(hidden_layers) - 1):
+            self.layers.append(nn.Linear(hidden_layers[i], hidden_layers[i+1]))
+            self.bns.append(nn.BatchNorm1d(hidden_layers[i+1]))
+
+        # Output layer
+        self.layers.append(nn.Linear(hidden_layers[-1], num_classes))
+
     def forward(self, x):
-        #################################################################################
-        # Implement the forward pass computations                                 #
-        #################################################################################
         m = activation_function_list[self.net_n]
-        for i in range(len(self.hidden_layers)):
+
+        # Forward pass through hidden layers
+        for i in range(len(self.bns)):
             x = self.layers[i](x)
+            x = self.bns[i](x)
             x = m(x)
-        x = (self.layers[len(self.hidden_layers)](x))
-        out=x
-        return out
+            x = self.dropout(x)  # Apply dropout after activation
+
+        # Output layer (no activation)
+        x = self.layers[-1](x)
+        return x
+
 
 class UA_surrogate_model(nn.Module):
     """

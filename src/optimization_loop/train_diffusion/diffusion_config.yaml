@@ -1,8 +1,8 @@
 diffusion_train:
   device: "cuda"
-  EPOCHS: 1
+  EPOCHS: 125
   LR : 0.001
-  NUM_WORKERS: 2
+  NUM_WORKERS: 199
   BATCH_SIZE : 128
   VIS_EPOCHS : 25
   MODEL_DIR : "src/optimization_loop/train_diffusion/weigths/Unet_weights"
@@ -18,8 +18,8 @@ data:
   # for  diffusion training
   # the name of the files inside the Base_DATA_DIR is needed  only 
   BASE_DATA_DIR: "data"
-  xs_train_path: "xs_train.npy"
-  ys_train_path:  "ys_train.npy"
+  xs_train_path: "xs_train_MPI.npy"
+  ys_train_path:  "ys_train_MPI.npy"
   coord_min_max_path: "coord_min_max.npy"
   label_min_max_path: "label_min_max.npy"
   # for surrogate_model training
@@ -29,19 +29,19 @@ data:
 UA_surrogate_model:
 
   device : "cuda"
-  init_cl_path: "src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/3_0_[150-200-200-150]/mlp_best_model.pt"
-  init_cd_path: "src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/3_0_[200-300-300-200]/mlp_best_model.pt"
+  init_cl_path: "src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/mlp_best_model_cl_150_200_200_150.pt"
+  init_cd_path: "src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/mlp_best_model_cd_200_300_300_200.pt"
   all_weigths_path: None
 
 
 surrogate_train:
-  train_flag: True
+  train_flag: False
   device: "cuda"
   input_size: 384
-  NUM_WORKERS:  2
+  NUM_WORKERS:  199
   BATCH_SIZE: 128
   EPOCHS: 250
-  LR : 0.000001
+  LR : 0.0001
   hidden_layers_cd_model: [200,300,300,200]
   hidden_layers_cl_model: [150,200,200,150]
   patience: 100
