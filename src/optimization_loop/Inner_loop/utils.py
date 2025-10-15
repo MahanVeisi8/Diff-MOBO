@@ -3,7 +3,7 @@ import scipy.io as sio
 import torch.nn as nn
 import numpy as np
 from pymoo.core.problem import Problem
-from models import UA_surrogate_model, MultiLayerPerceptron_forward , MultiLayerPerceptron_forward_classifier
+from models import UA_surrogate_model, MultiLayerPerceptron_forward
 from pathlib import Path
 import torch
 from torch.utils.data import DataLoader, TensorDataset , random_split
