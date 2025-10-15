@@ -81,7 +81,7 @@ import pickle
 
 NUM_CORES = 200
 
-# DB2 = np.load(rf"run_results_xstest.npy",allow_pickle=True).item()
+# DB = np.load(rf"DB_init.npy",allow_pickle=True).item()
 # with open("run_results_inSTP.npy", "rb") as f:
 #     DB2 = pickle.load(f)[:5]
 with open("DB_init.npy", "rb") as f:
@@ -90,14 +90,15 @@ with open("DB_init.npy", "rb") as f:
 airfoil_latent = DB["latents"]
 airfoil_shape = DB["shapes"]
 total_shapes = len(airfoil_shape)
+
 done = 0
 all_performances = []
 all_latents = []
 all_shapes = []
 
 batch_nums = (np.arange(np.ceil(total_shapes/NUM_CORES)) * NUM_CORES).tolist()
-if total_shapes % NUM_CORES != 0:
-    batch_nums.append(total_shapes)
+
+batch_nums.append(total_shapes)
 # print("hiii")
 # print(batch_nums)
 # # print(total_shapes)
@@ -139,6 +140,6 @@ print(p)
 np.save("DB_init.npy", {
         "latents": l,
         "shapes": s,
-        "performances": p
+        "performance": p
     })
 print("CFD simulation done!!!")

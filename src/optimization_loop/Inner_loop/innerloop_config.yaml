@@ -1,6 +1,6 @@
 process:
   iterations: 30
-  number_of_cores: 200   #  really important for running on cpu
+  number_of_cores: 200  #  really important for running on cpu
   checkpoint_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/updated"
 
 docker_setup:
@@ -13,7 +13,7 @@ model:
 
 sampling: 
   number_to_generate : 1000
-  batch_size : 256
+  batch_size : 128
 
 UA_surrogate_model:
   device: "cuda"

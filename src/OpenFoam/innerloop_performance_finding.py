@@ -97,8 +97,8 @@ all_latents = []
 all_shapes = []
 
 batch_nums = (np.arange(np.ceil(total_shapes/NUM_CORES)) * NUM_CORES).tolist()
-if total_shapes % NUM_CORES != 0:
-    batch_nums.append(total_shapes)
+
+batch_nums.append(total_shapes)
 # print("hiii")
 # print(batch_nums)
 # # print(total_shapes)
@@ -140,6 +140,6 @@ print(p)
 np.save("DB_CFD.npy", {
         "latents": l,
         "shapes": s,
-        "performances": p
+        "performance": p
     })
 print("CFD simulation done!!!")
