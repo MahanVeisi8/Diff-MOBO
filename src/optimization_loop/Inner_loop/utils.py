@@ -15,7 +15,7 @@ from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.optimize import minimize
 from tqdm import tqdm
 import pickle
-from scipy.stats import norm
+# from scipy.stats import norm
 
 
 DATA_DIR = Path(rf"../../../data")
@@ -24,7 +24,8 @@ x_min,y_min = coord_mm[0]; x_max,y_max = coord_mm[1]
 
 class BO_surrogate_uncertainty(Problem):
     def __init__(self,diffusion,num_cores=2, device = "cuda" ,n_iter=0 ):
-        super().__init__(n_var=384, n_obj=4, xl=0, xu=1)
+        super().__init__(n_var=384, n_obj=4, xl=-3, xu=3)
+        # super().__init__(n_var=384, n_obj=4, xl=0, xu=1)
         
         # setting up the diffusion models for getting designs out of latents
         self.diffusion = diffusion
@@ -57,10 +58,15 @@ class BO_surrogate_uncertainty(Problem):
     def _evaluate(self, latents, out, *args, **kwargs):
         net_n = len(self.UA_surrogate_model.cl_forward_mlps)
         # getting airfoil designs out of the latents
-        latents = np.clip(latents, 1e-3, 1-1e-3)  # avoid infs
-        latents = norm.ppf(latents)  # now ~ N(0,1)
-        latents = torch.from_numpy(latents).float() # this latent has  been generated form the algorithm (batch , 384)
+        # latents = np.clip(latents, 1e-3, 1-1e-3)  # avoid infs
+        # latents = norm.ppf(latents)  # now ~ N(0,1)
+        # latents = torch.from_numpy(latents).float() # this latent has  been generated form the algorithm (batch , 384)
         # Assuming latents in [0,1]
+        latents = torch.from_numpy(latents).float().to(self.device)  # (batch, 384)
+
+        # This keeps each latent sample close to zero mean/unit variance like torch.randn()
+        latents = (latents - latents.mean(dim=1, keepdim=True)) / (latents.std(dim=1, keepdim=True) + 1e-8)
+
 
         designs = self._latents_to_shapes(latents.reshape(latents.shape[0] , 2,  -1))
 

@@ -27,5 +27,5 @@ UA_surrogate_model:
 
 genetic_algorithm:
   number_generations: 100
-  population_size: 1000
+  population_size: 500
   from_DB_innerloop: False
