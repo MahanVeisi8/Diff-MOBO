@@ -82,7 +82,6 @@ import pickle
 
 NUM_CORES = 200
 
-# DB2 = np.load(rf"run_results_xstest.npy",allow_pickle=True).item()
 # with open("run_results_inSTP.npy", "rb") as f:
 #     DB2 = pickle.load(f)[:5]
 with open("DB_CFD.npy", "rb") as f:

@@ -15,12 +15,51 @@ from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.optimize import minimize
 from tqdm import tqdm
 import pickle
+from pymoo.operators.sampling.rnd import Sampling
+from pymoo.core.mutation import Mutation
+from pymoo.core.crossover import Crossover
 # from scipy.stats import norm
 
 
 DATA_DIR = Path(rf"../../../data")
 coord_mm = np.load(DATA_DIR/"coord_min_max.npy")  # [[x_min,y_min],[x_max,y_max]]
 x_min,y_min = coord_mm[0]; x_max,y_max = coord_mm[1]
+
+class GaussianSampling(Sampling):
+    def _do(self, problem, n_samples, **kwargs):
+        # Initialize population as Gaussian samples
+        X = torch.randn((n_samples, problem.n_var)).cpu().numpy()
+        return X
+
+class GaussianMutation(Mutation):
+    def __init__(self, sigma=0.1):
+        super().__init__()
+        self.sigma = sigma
+
+    def _do(self, problem, X, **kwargs):
+        # Add small Gaussian noise to each latent vector
+        X = X + np.random.randn(*X.shape) * self.sigma
+        return X
+
+class GaussianBlendCrossover(Crossover):
+    def __init__(self, alpha=0.5):
+        super().__init__(2, 2)
+        self.alpha = alpha
+
+    def _do(self, problem, X, **kwargs):
+        n_matings = X.shape[0]
+        n_var = problem.n_var
+        Y = np.empty_like(X)
+
+        for i in range(n_matings):
+            p1, p2 = X[i, 0, :], X[i, 1, :]
+            # Gaussian blend — both parents contribute randomly
+            mask = np.random.rand(n_var) < self.alpha
+            child1 = np.where(mask, p1, p2)
+            child2 = np.where(mask, p2, p1)
+            Y[i, 0, :] = child1
+            Y[i, 1, :] = child2
+        return Y    
 
 class BO_surrogate_uncertainty(Problem):
     def __init__(self,diffusion,num_cores=2, device = "cuda" ,n_iter=0 ):
@@ -65,7 +104,7 @@ class BO_surrogate_uncertainty(Problem):
         latents = torch.from_numpy(latents).float().to(self.device)  # (batch, 384)
 
         # This keeps each latent sample close to zero mean/unit variance like torch.randn()
-        latents = (latents - latents.mean(dim=1, keepdim=True)) / (latents.std(dim=1, keepdim=True) + 1e-8)
+        # latents = (latents - latents.mean(dim=1, keepdim=True)) / (latents.std(dim=1, keepdim=True) + 1e-8)
 
 
         designs = self._latents_to_shapes(latents.reshape(latents.shape[0] , 2,  -1))
@@ -247,7 +286,12 @@ def GEN_UA(config,problem_uncertainty:BO_surrogate_uncertainty,diffusion,device 
         
         print(full_samples.shape)
 
-    algorithm = NSGA2(pop_size=population_size)
+    # algorithm = NSGA2(pop_size=population_size)
+    algorithm = NSGA2(pop_size=population_size,
+                      sampling=GaussianSampling(),   # ✅ Gaussian initialization
+                        mutation=GaussianMutation(sigma=0.1),  # ✅ Gaussian-preserving mutation
+                        crossover=GaussianBlendCrossover(alpha=0.5)
+                      )
     res = minimize(problem_uncertainty,
                 algorithm,
                 ('n_gen', number_generations),
@@ -276,8 +320,8 @@ def NSGA_latent_to_shape(model ,diffusion,num_cores, docker_mount_path, checkpoi
     with open(os.path.join("Database", "DB_NSGA.npy"), "rb") as f:
             DB_NSGA = pickle.load(f)
         
-    NSGA_latent = DB_NSGA["ParetoSet"].reshape(DB_NSGA["ParetoSet"].shape[0], 2, -1)
-    NSGA_latent = torch.from_numpy(NSGA_latent).float()
+    NSGA_latent = DB_NSGA["ParetoSet"]
+    NSGA_latent = torch.from_numpy(NSGA_latent).float().reshape(DB_NSGA["ParetoSet"].shape[0], 2, -1)
 
     # Load model weights
     model.load_state_dict(torch.load(checkpoint_path, weights_only=True))
@@ -337,9 +381,10 @@ def Tagging_phase(docker_mount_path, iteration  = 0):
     performance = DB_CFD["performance"]
     latents = DB_CFD["latents"]
     shapes = DB_CFD["shapes"]
-    print(f"{latents.shape=}")
-    print(f"{shapes.shape=}")
-    print(f"{performance.shape=}")
+    # print(f"{latents.shape=}")
+    # print(f"{shapes.shape=}")
+    # print(f"{performance.shape=}")
+
     valids = {
         "latents" : [],
         "shapes" : [],
@@ -388,13 +433,25 @@ def Tagging_phase(docker_mount_path, iteration  = 0):
     print(f"{DB_innerloop['shapes'].shape=}")
     print(f"{DB_innerloop['performance'].shape=}")
     if len(valids["latents"]) > 0:
-        if valids["latents"].dim() == 2:
+        if valids["latents"].ndim == 2:
             appending_latents = np.expand_dims(valids["latents"],axis = 0)
             appending_shapes = np.expand_dims(valids["shapes"],axis = 0)
-        
+            appending_performance = np.expand_dims(valids["performance"],axis = 0)
+        else:
+            appending_latents = valids["latents"]
+            appending_shapes = valids["shapes"]
+            appending_performance = valids["performance"]
+
+        # print(f"{DB_innerloop['latents'].shape=}")
+        # print(f"{DB_innerloop['shapes'].shape=}")
+        # print(f"{DB_innerloop['performance'].shape=}")
+        # print(f"{appending_latents.shape=}")
+        # print(f"{appending_shapes.shape=}")
+        # print(f"{appending_performance.shape=}")
+        # print("hihiii")
         DB_innerloop["latents"] = np.concatenate([DB_innerloop["latents"] , appending_latents],axis = 0)
         DB_innerloop["shapes"] = np.concatenate([DB_innerloop["shapes"] , appending_shapes],axis = 0)
-        DB_innerloop["performance"] = np.concatenate([DB_innerloop["performance"] , appending_shapes],axis = 0)
+        DB_innerloop["performance"] = np.concatenate([DB_innerloop["performance"] , appending_performance],axis = 0)
 
     with open(os.path.join("Database" , f"DB_innerloop.npy"), "wb") as f:
         pickle.dump(DB_innerloop, f, protocol=4) # Compatible with python 3.6.9 in the docker

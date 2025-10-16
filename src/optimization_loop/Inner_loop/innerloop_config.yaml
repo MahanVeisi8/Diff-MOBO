@@ -8,7 +8,7 @@ docker_setup:
   docker_container_id: "f897792b6b56"  # make sure it has been started 
 
 model:
-  device : "cuda"
+  device : "cpu"
   unet_checkpoint: "../../../src/diffusion_notebooks/DIffusion_model_weigths_and_datas/dpp_0.1_autonorm_true_125_from_base_ddpm/model_epoch_124.pt"
 
 sampling: 
@@ -16,7 +16,7 @@ sampling:
   batch_size : 128
 
 UA_surrogate_model:
-  device: "cuda"
+  device: "cpu"
   saved_update_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/updated/UA_surrogate_model_8_channel.pt"
   learning_rate: 0.0001
   batch_size: 128
