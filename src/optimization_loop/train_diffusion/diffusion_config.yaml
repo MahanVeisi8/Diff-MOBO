@@ -5,14 +5,14 @@ diffusion_train:
   NUM_WORKERS: 199
   BATCH_SIZE : 128
   VIS_EPOCHS : 25
-  MODEL_DIR : "src/optimization_loop/train_diffusion/weigths/Unet_weights"
+  MODEL_DIR : "src/optimization_loop/train_diffusion/weigths/Unet_models"
   LOG_DIR : "src/optimization_loop/train_diffusion/weigths/Unet_logs"
   dpp_epoch_tres : -100
   cash_dpp_loss : 0
   LAMBDA_DPP : 0.1
   LAMBDA_QUALITY : 0.5
   DPP_WEIGTHS : [0.5,0.5]
-  Unet_starting_path : "src/diffusion_notebooks/DIffusion_model_weigths_and_datas/model_epoch_499_RMSnorm_unscaled.pt/model_epoch_499_RMSnorm_unscaled.pt"
+  Unet_starting_path : "src/diffusion_notebooks/DIffusion_model_weigths_and_datas/model_epoch_499_RMSnorm_unscaled.pt"
   
 data:
   # for  diffusion training

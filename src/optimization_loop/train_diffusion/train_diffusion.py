@@ -120,8 +120,10 @@ def calculate_dpp_loss_multi_objective(surrogate_model , generated_samples ,last
     gen_shape =  generated_samples.shape   # shape = (batch , 2, 192) 
     temp_generated_samples = generated_samples.permute(0,2,1) * 2 - 1    #shape = (batch , 192, 2)
     with torch.no_grad():
-        
-        labels = surrogate_model.get_cl_cd(temp_generated_samples.reshape(gen_shape[0], -1)) # (batch , 2)
+
+        # labels = surrogate_model.get_cl_cd(temp_generated_samples.reshape(gen_shape[0], -1)) # (batch , 2)
+        labels = surrogate_model(temp_generated_samples.reshape(gen_shape[0], -1)) # (batch , 2)
+
     generated_samples = generated_samples.reshape(gen_shape[0], -1)
     cl_scaled ,cd_scaled = torch.chunk(labels ,chunks=2, dim =1)
     # define the quality
@@ -239,7 +241,7 @@ def train_diffusion_model(config):
 
     optimizer = optim.AdamW(model.parameters(), lr=LR)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.75,
-                                patience=10, verbose=True)
+                                patience=10)#, verbose=True)
     loss_fn   = nn.L1Loss()
     writer    = SummaryWriter(log_dir=config["diffusion_train"]["LOG_DIR"])
     epoch_losses = []

@@ -4,6 +4,12 @@ __pycache__/
 *.pyo
 *.pyd
 
+# Model weights
+*.pt
+
+# OpenFOAM dirs
+src/OpenFoam/Airfoil_simulation_1/OpenFOAM_*/
+
 # Jupyter
 .ipynb_checkpoints/
 
