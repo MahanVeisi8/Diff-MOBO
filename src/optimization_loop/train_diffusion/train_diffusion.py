@@ -250,6 +250,7 @@ def train_diffusion_model(config):
     model.train()
     for epoch in range(EPOCHS):
         running_loss = 0.0
+        num_batch = 0
         pbar = tqdm(loader, desc=f"Epoch {epoch}/{EPOCHS-1}", leave=False)
         for coords_batch, _ in pbar:                      # labels unused for now
             coords_batch = coords_batch.to(device)        # (B,2,192)
@@ -262,17 +263,18 @@ def train_diffusion_model(config):
             x_t  = diffusion.q_sample(coords_batch, t, noise=noise)
             pred = diffusion.model(x_t, t)
             # calculating the dpp loss
-            model.eval()
-            with torch.no_grad():
-                generated_samples = diffusion.latent_sample(x_t , is_ddim=True)
-            dpp_loss = calculate_dpp_loss_multi_objective(surrogate_model=surrogate_model,
-                                                generated_samples=generated_samples,
-                                                last_cached_dpp_loss=cash_dpp_loss,
-                                                random_quality_weigths=DPP_WEIGTHS,
-                                                lambda_quality=LAMBDA_QUALITY,
-                                                )[0]
-            model.train()
-            cash_dpp_loss = dpp_loss.item()
+            if num_batch % 2 == (epoch %2):
+                model.eval()
+                with torch.no_grad():
+                    generated_samples = diffusion.latent_sample(x_t , is_ddim=True)
+                dpp_loss = calculate_dpp_loss_multi_objective(surrogate_model=surrogate_model,
+                                                    generated_samples=generated_samples,
+                                                    last_cached_dpp_loss=cash_dpp_loss,
+                                                    random_quality_weigths=DPP_WEIGTHS,
+                                                    lambda_quality=LAMBDA_QUALITY,
+                                                    )[0]
+                model.train()
+                cash_dpp_loss = dpp_loss.item()
             loss = loss_fn(noise, pred) + LAMBDA_DPP * cash_dpp_loss
 
             optimizer.zero_grad()
@@ -281,6 +283,7 @@ def train_diffusion_model(config):
 
             running_loss += loss.item()
             pbar.set_postfix(loss=f"{loss.item():.4f}")
+            num_batch += 1
             # break
         # # Calculating the dpp loss
         # if epoch> dpp_epoch_tres:
