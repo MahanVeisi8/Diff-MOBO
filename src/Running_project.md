@@ -49,8 +49,7 @@ We only need to set the inputs paths like:
 -   `ys_train_path`:  the path of ys_train.npy  file in the BASE_DATA_DIR.
 -   `coord_min_max_path`: the path of coord_min_max.npy  file in the BASE_DATA_DIR.
 -   `label_min_max_path`: the path of label_min_max.npy  file in the BASE_DATA_DIR.
--   The `init_cl_path`: for setting up each pipeline weigths for the surrogate_model for cl_weigthts.
--   The `init_cd_path`: for setting up each pipeline weigths for the surrogate_model for cd_weigthts.
+-   The `init_path`: for setting up each pipeline weigths for the surrogate_model .
 -   `all_weigths_path`: the path for the weigths of Ensemble if all of them is ina .pt file.
 -   `number_of_cores`: number of cores for running the codes.
 
