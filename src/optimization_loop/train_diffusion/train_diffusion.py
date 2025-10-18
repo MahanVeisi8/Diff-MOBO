@@ -276,7 +276,7 @@ def train_diffusion_model(config):
             x_t  = diffusion.q_sample(coords_batch, t, noise=noise)
             pred = diffusion.model(x_t, t)
             # calculating the dpp loss
-            if num_batch % 2 == (epoch %2):
+            if num_batch % 2 == (epoch %2) and config["diffusion_train"]["if_dpp"]:
                 model.eval()
                 with torch.no_grad():
                     generated_samples = diffusion.latent_sample(x_t , is_ddim=True)

@@ -11,6 +11,7 @@ diffusion_train:
   cash_dpp_loss : 0
   LAMBDA_DPP : 0.1
   LAMBDA_QUALITY : 0.5
+  if_dpp: True
   DPP_WEIGTHS : [0.5,0.5]
   Unet_starting_path : "src/diffusion_notebooks/DIffusion_model_weigths_and_datas/model_epoch_499_RMSnorm_unscaled.pt/model_epoch_499_RMSnorm_unscaled.pt"
   
