@@ -3,7 +3,7 @@ import scipy.io as sio
 import torch.nn as nn
 import numpy as np
 from pymoo.core.problem import Problem
-from models import UA_surrogate_model, MultiLayerPerceptron_forward
+from models import UA_surrogate_model, MultiLayerPerceptron_forward , Best_surrogate_model
 from pathlib import Path
 import torch
 from torch.utils.data import DataLoader, TensorDataset , random_split
@@ -85,7 +85,8 @@ class BO_surrogate_uncertainty(Problem):
         #     mu_model.eval()
         #     self.mu_models.append(mu_model)
 
-        self.UA_surrogate_model = UA_surrogate_model().to(self.device)
+        # self.UA_surrogate_model = UA_surrogate_model().to(self.device)
+        self.UA_surrogate_model = Best_surrogate_model().to(self.device)
         self.UA_surrogate_model.eval()
         # # if we need outo classifier
         # self.classifier_model = MultiLayerPerceptron_forward_classifier(input_size, hidden_size_mu, self.num_classes)
@@ -95,7 +96,7 @@ class BO_surrogate_uncertainty(Problem):
         # self.classifier_model.eval()
 
     def _evaluate(self, latents, out, *args, **kwargs):
-        net_n = len(self.UA_surrogate_model.cl_forward_mlps)
+        net_n = len(self.UA_surrogate_model.forward_mlps)
         # getting airfoil designs out of the latents
         # latents = np.clip(latents, 1e-3, 1-1e-3)  # avoid infs
         # latents = norm.ppf(latents)  # now ~ N(0,1)
@@ -457,7 +458,7 @@ def Tagging_phase(docker_mount_path, iteration  = 0):
         pickle.dump(DB_innerloop, f, protocol=4) # Compatible with python 3.6.9 in the docker
     print(f"saving the valids and invalids in Database")
 
-def Retraining_UA_modules(model, 
+def Retraining_UA_modules(model:Best_surrogate_model, 
                           checkpoint_path,
                           num_cores, 
                           device,
@@ -516,14 +517,15 @@ def Retraining_UA_modules(model,
             x, y = x.to(device), y.to(device)
 
             preds = model.get_cl_cd(x)
-            preds[:, 0] *= 1000
-            preds[:, 1] *= 1000
-            y[:, 0] *= 1000
-            y[:, 1] *= 1000
+            # preds[:, 0] *= 1000
+            # preds[:, 1] *= 1000
+            # y[:, 0] *= 1000
+            # y[:, 1] *= 1000
 
-            loss_cl = criterion(preds[:, 0], y[:, 0])
-            loss_cd = criterion(preds[:, 1], y[:, 1])
-            loss = LAMBDA_CL * loss_cl + LAMBDA_CD * loss_cd
+            # loss_cl = criterion(preds[:, 0], y[:, 0])
+            # loss_cd = criterion(preds[:, 1], y[:, 1])
+            loss = criterion(preds, y)
+            # loss = LAMBDA_CL * loss_cl + LAMBDA_CD * loss_cd
 
             optimizer.zero_grad()
             loss.backward()
@@ -543,9 +545,9 @@ def Retraining_UA_modules(model,
 
                 preds_val = model.get_cl_cd(x_val)
                 
-                val_loss_cl = criterion(preds_val[:, 0], y_val[:, 0])
-                val_loss_cd = criterion(preds_val[:, 1], y_val[:, 1])
-                val_loss = LAMBDA_CL * val_loss_cl + LAMBDA_CD * val_loss_cd
+                # val_loss_cl = criterion(preds_val[:, 0], y_val[:, 0])
+                # val_loss_cd = criterion(preds_val[:, 1], y_val[:, 1])
+                val_loss = criterion(preds_val, y_val)
 
                 total_val_loss += val_loss.item()
 
@@ -563,7 +565,7 @@ def Retraining_UA_modules(model,
             os.makedirs(os.path.dirname(checkpoint_path), exist_ok=True)
             torch.save(losses, os.path.join(checkpoint_path, f"losses_iter_{iteration}.pt"))
             torch.save(model.state_dict(), os.path.join(checkpoint_path, f"UA_weigths_iter_{iteration}.pt"))
-            torch.save(model.state_dict(), os.path.join(checkpoint_path, f"UA_surrogate_model_8_channel.pt"))
+            torch.save(model.state_dict(), os.path.join(checkpoint_path, f"UA_surrogate_model_10_channel.pt"))
             print(f"Saved new best model at epoch {epoch+1} with val loss {best_val_loss:.4f}")
         else:
             patience_counter += 1

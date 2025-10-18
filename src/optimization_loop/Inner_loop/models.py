@@ -277,34 +277,31 @@ class Best_surrogate_model(nn.Module):
         
         each_line = []
         for i in range(len(self.forward_mlps)):
-            cl , cd = self.forward_mlps[i](x)
+            cl = self.forward_mlps[i](x)[:,0:1]
+            cd = self.forward_mlps[i](x)[:,1:2]
             each_line.append(torch.concat([cl,cl / (cd + Eps)],dim=1))
         
 
         return each_line
 
-    def get_cl_cd(self,x):
-        cl = []
-        cd = []
-        for i in range(len(self.cl_forward_mlps)):
-            cl_temp , cd_temp = self.forward_mlps[i](x)
-            cl.append(cl_temp)
-            cd.append(cd_temp)
+    def get_cl_cd(self, x):
+        # Collect each MLP's output: (B, 2) each -> stack to (M, B, 2)
+        outs = torch.stack([mlp(x) for mlp in self.forward_mlps], dim=0)
 
-        cl =torch.stack(cl,dim=0)
-        cd = torch.stack(cd,dim=0)
-        # print(f"{cl.shape=}")
-        # print(f"{cd.shape=}")
-        ans = torch.concat([cl,cd],dim=-1)
-        # print(f"{ans.shape=}")
-        reproduced_Performance_mu = (1 / len(self.forward_mlps)) * torch.sum(ans, dim=0)
-        # print(f"{reproduced_Performance_mu.shape=}")
-        return reproduced_Performance_mu
+        # Mean over ensemble dimension M -> (B, 2)
+        mean_out = outs.mean(dim=0)
+
+        # Optionally expose the columns
+        cl_mean = mean_out[:, 0]  # (B,)
+        cd_mean = mean_out[:, 1]  # (B,)
+
+        return mean_out  # shape (B, 2), columns = [cl_mean, cd_mean]
 
 
 
 if __name__  == "__main__":
-    model = UA_surrogate_model()
+    model = Best_surrogate_model()
     x = torch.zeros((2,384))
-    out = model.get_cl_cd(x)
-    print(out)
+    # out = model.get_cl_cd(x)
+    out = model(x)
+    print(len(out))
