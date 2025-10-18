@@ -297,7 +297,7 @@ def train_diffusion_model(config):
             running_loss += loss.item()
             pbar.set_postfix(loss=f"{loss.item():.4f}")
             num_batch += 1
-            break
+            # break
         # # Calculating the dpp loss
         # if epoch> dpp_epoch_tres:
         #     model.eval()
