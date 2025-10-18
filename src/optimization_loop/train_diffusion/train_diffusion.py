@@ -216,10 +216,11 @@ def train_diffusion_model(config):
         #                          ).to(device)
         surrogate_model = MultiLayerPerceptron_forward(input_size=192 * 2, 
                                  hidden_layers=[150,200,200,150],
-                                 path_cd_model=config["UA_surrogate_model"]["init_path"],
                                  net_n=3,
                                  num_classes=2
                                  ).to(device)
+        surrogate_model.load_state_dict(torch.load(config["UA_surrogate_model"]["init_path"],weights_only=True))
+        surrogate_model = surrogate_model.to(config["UA_surrogate_model"]["device"])
     else:
         # surrogate_model = UA_surrogate_model()
         surrogate_model = MultiLayerPerceptron_forward(input_size=192 * 2, 
@@ -227,7 +228,7 @@ def train_diffusion_model(config):
                                  net_n=3,
                                  num_classes=2
                                  ).to(device)
-        surrogate_model = surrogate_model.load_state_dict(torch.load(config["UA_surrogate_model"]["all_weigths_path"],weights_only=True))
+        surrogate_model.load_state_dict(torch.load(config["UA_surrogate_model"]["all_weigths_path"],weights_only=True))
         surrogate_model = surrogate_model.to(config["UA_surrogate_model"]["device"])
         
 
@@ -296,7 +297,7 @@ def train_diffusion_model(config):
             running_loss += loss.item()
             pbar.set_postfix(loss=f"{loss.item():.4f}")
             num_batch += 1
-            # break
+            break
         # # Calculating the dpp loss
         # if epoch> dpp_epoch_tres:
         #     model.eval()
@@ -415,17 +416,18 @@ def train_surrogate_model(config):
         #                          ).to(device)
         model_mlp = MultiLayerPerceptron_forward(input_size=192 * 2, 
                                  hidden_layers=[150,200,200,150],
-                                 path_cd_model=config["UA_surrogate_model"]["init_path"],
                                  net_n=3,
                                  num_classes=2
                                  ).to(device)
+        model_mlp.load_state_dict(torch.load(config["UA_surrogate_model"]["init_path"],weights_only=True))
+        model_mlp = model_mlp.to(config["UA_surrogate_model"]["device"])
     else:
         model_mlp = MultiLayerPerceptron_forward(input_size=192 * 2, 
                                  hidden_layers=[150,200,200,150],
                                  net_n=3,
                                  num_classes=2
                                  ).to(device)
-        model_mlp = model_mlp.load_state_dict(torch.load(config["UA_surrogate_model"]["all_weigths_path"],weights_only=True))
+        model_mlp.load_state_dict(torch.load(config["UA_surrogate_model"]["all_weigths_path"],weights_only=True))
         model_mlp = model_mlp.to(config["UA_surrogate_model"]["device"])
         
         
@@ -458,12 +460,15 @@ def train_surrogate_model(config):
             # print(f"{labels.shape=}")
             optimizer.zero_grad()
             outputs = model_mlp(features)  # shape (batch, 2)
-            outputs *= 1000
-            labels[:,-1] *= 1000  #cd
-            labels[:,0] *= 1000   #cl
-            loss = config["surrogate_train"]["LAMBDA_CD"] * criterion_train(outputs[:,1], labels[:,1]) #cd
+            # outputs *= 1000
+            # labels[:,-1] *= 1000  #cd
+            # labels[:,0] *= 1000   #cl
+            # loss = config["surrogate_train"]["LAMBDA_CD"] * criterion_train(outputs[:,1], labels[:,1]) #cd
+            # # loss =0 
+            # loss += config["surrogate_train"]["LAMBDA_CL"] * criterion_train(outputs[:,0], labels[:,0])   #cl
+            loss = criterion_train(outputs, labels) #cd
             # loss =0 
-            loss += config["surrogate_train"]["LAMBDA_CL"] * criterion_train(outputs[:,0], labels[:,0])   #cl
+            # loss += config["surrogate_train"]["LAMBDA_CL"] * criterion_train(outputs[:,0], labels[:,0])   #cl
             loss.backward()
             optimizer.step()
 
@@ -486,8 +491,7 @@ def train_surrogate_model(config):
                 # print(f"{preds.shape=}")
                 # print(f"{labels[:,1].shape=}")
                 # sys.exit()
-                test_loss += (criterion_val(preds[:,1], labels[:,1]) + 
-                              criterion_val(preds[:,0], labels[:,0])).item() * features.size(0)
+                test_loss =criterion_val(preds, labels).item() * features.size(0)
                 # test_loss += (criterion_val(preds[:,0], labels[:,0])).item() * features.size(0)
         epoch_test_loss = test_loss / len(test_loader.dataset)
         test_losses.append(epoch_test_loss)
@@ -501,8 +505,8 @@ def train_surrogate_model(config):
             best_epoch = epoch
             epochs_no_improve = 0
             # saving both cl , cd best paths.
-            torch.save(model_mlp.cl_forward_mlp.state_dict(), os.path.join(config["surrogate_train"]["MODEL_DIR"],"best_cl_model.pt"))
-            torch.save(model_mlp.cd_forward_mlp.state_dict(), os.path.join(config["surrogate_train"]["MODEL_DIR"],"best_cd_model.pt"))
+            torch.save(model_mlp.state_dict(), os.path.join(config["surrogate_train"]["MODEL_DIR"],"best_forward_mlp_model.pt"))
+            # torch.save(model_mlp.cd_forward_mlp.state_dict(), os.path.join(config["surrogate_train"]["MODEL_DIR"],"best_cd_model.pt"))
             print(f"New best model at epoch {epoch} with test loss {best_loss:.6f}")
         else:
             epochs_no_improve += 1

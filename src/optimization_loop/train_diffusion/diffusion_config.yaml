@@ -1,18 +1,18 @@
 diffusion_train:
   device: "cuda"
-  EPOCHS: 125
+  EPOCHS: 100
   LR : 0.001
-  NUM_WORKERS: 199
+  NUM_WORKERS: 255
   BATCH_SIZE : 128
   VIS_EPOCHS : 25
-  MODEL_DIR : "src/optimization_loop/train_diffusion/weigths/Unet_models"
+  MODEL_DIR : "src/optimization_loop/train_diffusion/weigths/Unet_weights"
   LOG_DIR : "src/optimization_loop/train_diffusion/weigths/Unet_logs"
   dpp_epoch_tres : -100
   cash_dpp_loss : 0
   LAMBDA_DPP : 0.1
   LAMBDA_QUALITY : 0.5
   DPP_WEIGTHS : [0.5,0.5]
-  Unet_starting_path : "src/diffusion_notebooks/DIffusion_model_weigths_and_datas/model_epoch_499_RMSnorm_unscaled.pt"
+  Unet_starting_path : "src/diffusion_notebooks/DIffusion_model_weigths_and_datas/model_epoch_499_RMSnorm_unscaled.pt/model_epoch_499_RMSnorm_unscaled.pt"
   
 data:
   # for  diffusion training
@@ -29,7 +29,7 @@ data:
 UA_surrogate_model:
 
   device : "cuda"
-  init_path: "src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/mlp_best_model_cl_150_200_200_150.pt"
+  init_path: "/home/bardiya/projects/diffusion_air_manifolding/codes/creative-generativeai-diffusion/src/surrogate_models/mlp_best_model_final.pt"
   # init_cl_path: "src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/mlp_best_model_cl_150_200_200_150.pt"
   # init_cd_path: "src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/mlp_best_model_cd_200_300_300_200.pt"
   all_weigths_path: None
@@ -37,15 +37,15 @@ UA_surrogate_model:
 
 surrogate_train:
   train_flag: False
+  # train_flag: True
   device: "cuda"
   input_size: 384
-  NUM_WORKERS:  199
+  NUM_WORKERS: 255
   BATCH_SIZE: 128
-  EPOCHS: 250
+  EPOCHS: 100
   LR : 0.0001
-  hidden_layers_cd_model: [200,300,300,200]
-  hidden_layers_cl_model: [150,200,200,150]
-  patience: 100
+  hidden_layers: [150,200,200,150]
+  patience: 40
   MODEL_DIR : "src/optimization_loop/train_diffusion/weigths/surrogate_weigths"
   LOG_DIR : "src/optimization_loop/train_diffusion/weigths/surrogate_logs"
   LAMBDA_CD: 100

@@ -205,7 +205,7 @@ class UA_surrogate_model(nn.Module):
         # print(f"{reproduced_Performance_mu.shape=}")
         return reproduced_Performance_mu
 
-class Best_surrogate_model(nn.modules):
+class Best_surrogate_model(nn.Module):
     """
         input_shape = flat(batch , 192 , 2) -> (batch , 384)
         output_shape = list of the (batch,2)  shapes for each MLP
@@ -226,7 +226,6 @@ class Best_surrogate_model(nn.modules):
                 ],
                 net_n= [0,1,2,3,4,0,1,2,3,4],  
                 path_models =None, 
-
                 ):
         self.net_n = net_n
         super(Best_surrogate_model,self).__init__()
@@ -303,7 +302,7 @@ class Best_surrogate_model(nn.modules):
         return reproduced_Performance_mu
 
 
-    
+
 if __name__  == "__main__":
     model = UA_surrogate_model()
     x = torch.zeros((2,384))
