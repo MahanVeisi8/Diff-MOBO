@@ -378,3 +378,156 @@ class Hybrid_surrogate_MLP(nn.Module):
         return torch.stack([cl,cd],dim=1).squeeze(-1)
  
 
+
+def _pair(x):
+    if isinstance(x, (tuple, list)):
+        return int(x[0]), int(x[1])
+    return int(x), int(x)
+
+class Conv2dSame(nn.Module):
+    """
+    TensorFlow-like 'SAME' padding for Conv2d, supporting arbitrary stride.
+    Pads dynamically in forward, then runs conv with padding=0.
+    """
+    def __init__(self, in_ch, out_ch, kernel_size=(1,1), stride=(1,1), bias=False):
+        super().__init__()
+        kH, kW = _pair(kernel_size)
+        sH, sW = _pair(stride)
+        self.kH, self.kW = kH, kW
+        self.sH, self.sW = sH, sW
+        self.conv = nn.Conv2d(in_ch, out_ch, kernel_size=(kH, kW), stride=(sH, sW),
+                              padding=0, bias=bias)
+
+    def forward(self, x):
+        # x: (N, C, H, W)
+        H, W = x.shape[-2], x.shape[-1]
+        # target output sizes (TF SAME): ceil(H/stride)
+        outH = (H + self.sH - 1) // self.sH
+        outW = (W + self.sW - 1) // self.sW
+        # total padding needed
+        padH = max((outH - 1) * self.sH + self.kH - H, 0)
+        padW = max((outW - 1) * self.sW + self.kW - W, 0)
+        # split: left/top get floor, right/bottom get the rest
+        pad_top  = padH // 2
+        pad_bot  = padH - pad_top
+        pad_left = padW // 2
+        pad_right= padW - pad_left
+        if padH > 0 or padW > 0:
+            x = F.pad(x, (pad_left, pad_right, pad_top, pad_bot))
+        return self.conv(x)
+
+class BottleResBlock(nn.Module):
+    def __init__(self, in_ch, out_ch, kernel_size=(4,2), downsample=False, bn_momentum=0.1):
+        super().__init__()
+        stride = (2,1) if downsample else (1,1)
+
+        # BN -> LReLU -> Conv(SAME)
+        self.bn1 = nn.BatchNorm2d(in_ch, momentum=bn_momentum)
+        self.act1 = nn.LeakyReLU(0.2, inplace=True)
+        self.conv1 = Conv2dSame(in_ch, out_ch, kernel_size=kernel_size, stride=stride, bias=False)
+
+        # BN -> LReLU -> Conv(SAME, stride=1)
+        self.bn2 = nn.BatchNorm2d(out_ch, momentum=bn_momentum)
+        self.act2 = nn.LeakyReLU(0.2, inplace=True)
+        self.conv2 = Conv2dSame(out_ch, out_ch, kernel_size=kernel_size, stride=(1,1), bias=False)
+
+        # Skip path projection if stride or channels differ
+        self.proj = None
+        if downsample or in_ch != out_ch:
+            self.proj = nn.Conv2d(in_ch, out_ch, kernel_size=1, stride=stride, bias=False)
+
+    def forward(self, x):
+        identity = x
+        out = self.bn1(x)
+        out = self.act1(out)
+        out = self.conv1(out)
+
+        out = self.bn2(out)
+        out = self.act2(out)
+        out = self.conv2(out)
+
+        if self.proj is not None:
+            identity = self.proj(identity)
+
+        return out + identity
+
+class MOPADGAN_surrogate_model(nn.Module):
+    def __init__(self, n_points=192, depth=16, bn_momentum=0.1):
+        """
+        Input shape during forward: (N, 1, n_points, 2), channel-first.
+        """
+        super().__init__()
+        k = (4, 2)
+
+        # Stem: in_ch=1 -> depth  (SAME)
+        self.stem = Conv2dSame(1, depth, kernel_size=k, stride=(1,1), bias=False)
+
+        # Residual groups [2,2,2,2]
+        self.group0 = nn.Sequential(
+            BottleResBlock(depth, depth,   kernel_size=k, downsample=False, bn_momentum=bn_momentum),
+            BottleResBlock(depth, depth,   kernel_size=k, downsample=False, bn_momentum=bn_momentum),
+        )
+        self.group1 = nn.Sequential(
+            BottleResBlock(depth, depth*2, kernel_size=k, downsample=True,  bn_momentum=bn_momentum),
+            BottleResBlock(depth*2, depth*2, kernel_size=k, downsample=False, bn_momentum=bn_momentum),
+        )
+        self.group2 = nn.Sequential(
+            BottleResBlock(depth*2, depth*4, kernel_size=k, downsample=True,  bn_momentum=bn_momentum),
+            BottleResBlock(depth*4, depth*4, kernel_size=k, downsample=False, bn_momentum=bn_momentum),
+        )
+        self.group3 = nn.Sequential(
+            BottleResBlock(depth*4, depth*8, kernel_size=k, downsample=True,  bn_momentum=bn_momentum),
+            BottleResBlock(depth*8, depth*8, kernel_size=k, downsample=False, bn_momentum=bn_momentum),
+        )
+
+        # Tail BN + LeakyReLU
+        self.tail_bn  = nn.BatchNorm2d(depth*8, momentum=bn_momentum)
+        self.tail_act = nn.LeakyReLU(0.2, inplace=True)
+
+        # Global average pool to (1,1)
+        self.gap = nn.AdaptiveAvgPool2d((1,1))
+
+        # Dense head: 128 -> BN -> LeakyReLU -> 2 -> Sigmoid
+        self.fc1 = nn.Linear(depth*8, 128, bias=False)
+        self.fc1_bn = nn.BatchNorm1d(128, momentum=bn_momentum)
+        self.fc1_act = nn.LeakyReLU(0.2, inplace=True)
+        self.fc2 = nn.Linear(128, 2)
+
+        self._init_weights()
+
+    def _init_weights(self):
+        # He init (fan-in) matching TF VarianceScaling(scale=2.0, mode='fan_in')
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, a=0.2, mode='fan_in', nonlinearity='leaky_relu')
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
+            elif isinstance(m, nn.Linear):
+                nn.init.kaiming_normal_(m.weight, a=0.2, mode='fan_in', nonlinearity='leaky_relu')
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
+            elif isinstance(m, (nn.BatchNorm2d, nn.BatchNorm1d)):
+                nn.init.ones_(m.weight)
+                nn.init.zeros_(m.bias)
+
+    def forward(self, x):
+        # x: (N, 1, n_points, 2)
+        x = self.stem(x)
+        x = self.group0(x)
+        x = self.group1(x)
+        x = self.group2(x)
+        x = self.group3(x)
+
+        x = self.tail_bn(x)
+        x = self.tail_act(x)
+
+        x = self.gap(x)             # (N, C, 1, 1)
+        x = torch.flatten(x, 1)     # (N, C)
+
+        x = self.fc1(x)
+        x = self.fc1_bn(x)
+        x = self.fc1_act(x)
+
+        x = self.fc2(x)
+        x = torch.sigmoid(x)        # match TF head
+        return x

@@ -29,8 +29,9 @@ data:
 UA_surrogate_model:
 
   device : "cuda"
-  init_cl_path: "src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/mlp_best_model_cl_150_200_200_150.pt"
-  init_cd_path: "src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/mlp_best_model_cd_200_300_300_200.pt"
+  init_path: "src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/mlp_best_model_cl_150_200_200_150.pt"
+  # init_cl_path: "src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/mlp_best_model_cl_150_200_200_150.pt"
+  # init_cd_path: "src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/mlp_best_model_cd_200_300_300_200.pt"
   all_weigths_path: None
 
 

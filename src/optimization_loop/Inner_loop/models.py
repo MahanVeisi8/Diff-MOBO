@@ -205,7 +205,105 @@ class UA_surrogate_model(nn.Module):
         # print(f"{reproduced_Performance_mu.shape=}")
         return reproduced_Performance_mu
 
+class Best_surrogate_model(nn.modules):
+    """
+        input_shape = flat(batch , 192 , 2) -> (batch , 384)
+        output_shape = list of the (batch,2)  shapes for each MLP
+    """
+    def __init__(self,
+                input_size =  192 * 2, 
+                hidden_layers = [
+                [150,200,200,150],
+                [150,200,200,150],
+                [150,200,200,150],
+                [150,200,200,150],
+                [150,200,200,150],
+                [150,200,200,150],
+                [150,200,200,150],
+                [150,200,200,150],
+                [150,200,200,150],
+                [150,200,200,150]
+                ],
+                net_n= [0,1,2,3,4,0,1,2,3,4],  
+                path_models =None, 
 
+                ):
+        self.net_n = net_n
+        super(Best_surrogate_model,self).__init__()
+        self.forward_mlps = nn.ModuleList()
+        for i in range(len(net_n)):
+            self.forward_mlps.append(
+                MultiLayerPerceptron_forward(input_size , hidden_layers[i] ,   num_classes=2  , net_n=net_n[i])
+            )
+            if path_models:
+                self.forward_mlps[i].load_state_dict(torch.load(path_models[i],map_location="cpu" ,weights_only=True))
+        
+        self.init_weigths()
+    
+    def init_weigths(self):
+        """
+            initializingthe weigths,
+            for relu  types: [1, 2, 3, 4] -> relubased -> kaiming init
+            for relu  types: [0] -> relubased -> xaier uniform init
+        """
+
+        def init_mlp_weights(mlp, activation_type):
+            # Map activation index to type name
+            # Adjust based on your activation_function_list
+            relu_like = [1, 2, 3, 4]   # ReLU-family activations
+            tanh_like = [0]                 # tanh-based activations
+
+            for layer in mlp.modules():
+                if isinstance(layer, nn.Linear):
+                    if activation_type in relu_like:
+                        nn.init.kaiming_uniform_(layer.weight, nonlinearity='relu')
+                    elif activation_type in tanh_like:
+                        nn.init.xavier_uniform_(layer.weight)
+                    else:
+                        # fallback to Xavier if unknown
+                        nn.init.xavier_uniform_(layer.weight)
+                    
+                    if layer.bias is not None:
+                        nn.init.zeros_(layer.bias)
+
+        # Initialize cl (lift coefficient) networks
+        for mlp, net_type in zip(self.forward_mlps, self.net_n):
+            init_mlp_weights(mlp, net_type)
+
+
+    def forward(self, x , Eps = 1e-10):
+        #################################################################################
+        # Implement the forward pass computations                                 #
+        #################################################################################
+        
+        each_line = []
+        for i in range(len(self.forward_mlps)):
+            cl , cd = self.forward_mlps[i](x)
+            each_line.append(torch.concat([cl,cl / (cd + Eps)],dim=1))
+        
+
+        return each_line
+
+    def get_cl_cd(self,x):
+        cl = []
+        cd = []
+        for i in range(len(self.cl_forward_mlps)):
+            cl_temp , cd_temp = self.forward_mlps[i](x)
+            cl.append(cl_temp)
+            cd.append(cd_temp)
+
+        cl =torch.stack(cl,dim=0)
+        cd = torch.stack(cd,dim=0)
+        # print(f"{cl.shape=}")
+        # print(f"{cd.shape=}")
+        ans = torch.concat([cl,cd],dim=-1)
+        # print(f"{ans.shape=}")
+        reproduced_Performance_mu = (1 / len(self.forward_mlps)) * torch.sum(ans, dim=0)
+        # print(f"{reproduced_Performance_mu.shape=}")
+        return reproduced_Performance_mu
+
+
+    
 if __name__  == "__main__":
     model = UA_surrogate_model()
     x = torch.zeros((2,384))

@@ -19,7 +19,7 @@ import os,sys
 import torch
 import os
 from pathlib import Path
-from surrogate_models.models import Hybrid_surrogate_MLP
+from surrogate_models.models import Hybrid_surrogate_MLP, MultiLayerPerceptron_forward
 import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.tensorboard import SummaryWriter
@@ -66,7 +66,8 @@ def calculate_dpp_loss_single_objective(surrogate_model , generated_samples,last
 
     temp_generated_samples = generated_samples.permute(0,2,1)  * 2 - 1    #shape = (batch , 192, 2)
     with torch.no_grad():
-        labels = surrogate_model.get_cl_cd(temp_generated_samples) # (batch , 2)
+        labels = surrogate_model(temp_generated_samples) # (batch , 2)
+        # labels = surrogate_model.get_cl_cd(temp_generated_samples) # (batch , 2)
     generated_samples = generated_samples.reshape(gen_shape[0], -1)
     cl_scaled ,cd_scaled = torch.chunk(labels ,chunks=2, dim =1)
     # define the quality
@@ -207,14 +208,25 @@ def train_diffusion_model(config):
     #                                 path_cl_model=path_cl_model
     #                                 ).to(device)
     if config["UA_surrogate_model"]["all_weigths_path"] != None:
-        surrogate_model = Hybrid_surrogate_MLP(input_size=192 * 2, 
-                                 hidden_layers_cd_model=[200,300,300,200],
-                                 hidden_layers_cl_model=[150, 200,200,150],
-                                 path_cd_model=config["UA_surrogate_model"]["init_cd_path"],
-                                 path_cl_model=config["UA_surrogate_model"]["init_cl_path"]
+        # surrogate_model = Hybrid_surrogate_MLP(input_size=192 * 2, 
+        #                          hidden_layers_cd_model=[200,300,300,200],
+        #                          hidden_layers_cl_model=[150, 200,200,150],
+        #                          path_cd_model=config["UA_surrogate_model"]["init_cd_path"],
+        #                          path_cl_model=config["UA_surrogate_model"]["init_cl_path"]
+        #                          ).to(device)
+        surrogate_model = MultiLayerPerceptron_forward(input_size=192 * 2, 
+                                 hidden_layers=[150,200,200,150],
+                                 path_cd_model=config["UA_surrogate_model"]["init_path"],
+                                 net_n=3,
+                                 num_classes=2
                                  ).to(device)
     else:
-        surrogate_model = UA_surrogate_model()
+        # surrogate_model = UA_surrogate_model()
+        surrogate_model = MultiLayerPerceptron_forward(input_size=192 * 2, 
+                                 hidden_layers=[150,200,200,150],
+                                 net_n=3,
+                                 num_classes=2
+                                 ).to(device)
         surrogate_model = surrogate_model.load_state_dict(torch.load(config["UA_surrogate_model"]["all_weigths_path"],weights_only=True))
         surrogate_model = surrogate_model.to(config["UA_surrogate_model"]["device"])
         
@@ -393,16 +405,26 @@ def train_surrogate_model(config):
     #                                 path_cl_model=config["surrogate_train"]["cl_path"]
     #                                 ).to(device)
     if config["UA_surrogate_model"]["all_weigths_path"] !=None:
-        model_mlp = Hybrid_surrogate_MLP(input_size=192 * 2, 
-                                 hidden_layers_cd_model=[200,300,300,200],
-                                 hidden_layers_cl_model=[150, 200,200,150],
-                                 path_cd_model=config["UA_surrogate_model"]["init_cd_path"],
-                                 path_cl_model=config["UA_surrogate_model"]["init_cl_path"],
-                                 net_n_cd=3,
-                                 net_n_cl=3
+        # model_mlp = Hybrid_surrogate_MLP(input_size=192 * 2, 
+        #                          hidden_layers_cd_model=[200,300,300,200],
+        #                          hidden_layers_cl_model=[150, 200,200,150],
+        #                          path_cd_model=config["UA_surrogate_model"]["init_cd_path"],
+        #                          path_cl_model=config["UA_surrogate_model"]["init_cl_path"],
+        #                          net_n_cd=3,
+        #                          net_n_cl=3
+        #                          ).to(device)
+        model_mlp = MultiLayerPerceptron_forward(input_size=192 * 2, 
+                                 hidden_layers=[150,200,200,150],
+                                 path_cd_model=config["UA_surrogate_model"]["init_path"],
+                                 net_n=3,
+                                 num_classes=2
                                  ).to(device)
     else:
-        model_mlp = UA_surrogate_model()
+        model_mlp = MultiLayerPerceptron_forward(input_size=192 * 2, 
+                                 hidden_layers=[150,200,200,150],
+                                 net_n=3,
+                                 num_classes=2
+                                 ).to(device)
         model_mlp = model_mlp.load_state_dict(torch.load(config["UA_surrogate_model"]["all_weigths_path"],weights_only=True))
         model_mlp = model_mlp.to(config["UA_surrogate_model"]["device"])
         
