@@ -17,10 +17,10 @@ sampling:
 
 UA_surrogate_model:
   device: "cpu"
-  saved_update_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/updated/UA_surrogate_model_8_channel.pt"
+  saved_update_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/updated/UA_surrogate_model_10_channel.pt"
   learning_rate: 0.0001
   batch_size: 128
-  epoches: 200
+  epoches: 150
   patience: 50
   LAMBDA_CL: 1
   LAMBDA_CD: 100
