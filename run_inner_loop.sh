@@ -2,7 +2,7 @@
 
 cd src/optimization_loop/Inner_loop || exit 1  # exit if directory not found
 
-for ((i=0; i<30; i++)); do
+for ((i=0; i<15; i++)); do
     echo "=== Iteration $i ==="
 
     if [ "$i" -eq 0 ]; then

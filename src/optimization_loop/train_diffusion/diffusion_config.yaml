@@ -1,6 +1,6 @@
 diffusion_train:
   device: "cuda"
-  EPOCHS: 100
+  EPOCHS: 50
   LR : 0.001
   NUM_WORKERS: 255
   BATCH_SIZE : 128
