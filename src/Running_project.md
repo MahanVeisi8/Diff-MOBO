@@ -79,6 +79,11 @@ after running this we should have `src/optimization_loop/Inner_loop/UA_surrogate
 
 At the End, we need to save the `DB_innerloops.npy` files for the correct samples. 
 
+```
+*********  Warning  **********
+    report this Stage outputs first then go to the next Stage
+*********  Warning  **********
+```
 ## Stage4. Running the inner_loop bash file but with model_epoch_499_RMSnorm_unscaled.pt
 After the last Stage, now we have to get the result of the base line (without dpp) diffusion model to.
 in the `src/optimization_loop/Inner_loop/innerloop_config.yaml` change the `unet_checkpoint` to the path of the `model_epoch_499_RMSnorm_unscaled.pt` model, the format should also start  with  `../../..` like:
