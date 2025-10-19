@@ -75,6 +75,16 @@ But be carefull:
 -   `[UA_surrogate_model][saved_update_path]`: the file path that saves the final weigth of the surrogate model. 
 
 
-after running this we should have `src/optimization_loop/Inner_loop/UA_surrogate_weights/updated/UA_surrogate_model_8_channel.pt` for UA_weigths and the `DB_valids` and `DB_invvalids`  for each iterations.
+after running this we should have `src/optimization_loop/Inner_loop/UA_surrogate_weights/updated/UA_surrogate_model_10_channel.pt` for UA_weigths and the `DB_valids` and `DB_invvalids`  for each iterations.
+
+At the End, we need to save the `DB_innerloops.npy` files for the correct samples. 
+
+## Stage4. Running the inner_loop bash file but with model_epoch_499_RMSnorm_unscaled.pt
+After the last Stage, now we have to get the result of the base line (without dpp) diffusion model to.
+in the `src/optimization_loop/Inner_loop/innerloop_config.yaml` change the `unet_checkpoint` to the path of the `model_epoch_499_RMSnorm_unscaled.pt` model, the format should also start  with  `../../..` like:
+
+`"../../../src/diffusion_notebooks/DIffusion_model_weigths_and_datas/dpp_0.1_autonorm_true_125_from_base_ddpm/model_epoch_499_RMSnorm_unscaled.pt"`
+
+after running this we should have `src/optimization_loop/Inner_loop/UA_surrogate_weights/updated/UA_surrogate_model_10_channel.pt` for UA_weigths and the `DB_valids` and `DB_invalids`  for each iterations.
 
 At the End, we need to save the `DB_innerloops.npy` files for the correct samples. 
