@@ -273,6 +273,7 @@ def init_tagging(docker_mount_path, iteration  = 0):
     # print(f"{valids['latents'].shape=}")
     # print(f"{valids['shapes'].shape=}")
     # print(f"{valids['performance'].shape=}")
+    os.makedirs("Database", exist_ok=True)
     with open(os.path.join("Database" , "DB_innerloop.npy"), "wb") as f:
         pickle.dump(valids, f, protocol=4) # Compatible with python 3.6.9 in the docker
 

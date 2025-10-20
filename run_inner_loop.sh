@@ -12,7 +12,7 @@ for ((i=0; i<15; i++)); do
 
     if [ "$i" -eq 0 ]; then
         # Run inner_loop_creation_1 (GPU only, no Docker)
-        python3 innerloop_creation_1.py --iteration "$i"
+        python innerloop_creation_1.py --iteration "$i"
         
         # Run inner_loop_creation_2 (CPU + Docker) via SSH to CPU cluster
         echo "Running innerloop_creation_2.py on CPU cluster via SSH..."
@@ -23,18 +23,12 @@ for ((i=0; i<15; i++)); do
             exit 1
         fi
     fi
+    # Run inner_loop_creation_3 (GPU only, no Docker)
+    python innerloop_creation_3.py --iteration "$i"
 
-    # Run inner_loop_creation_3 (CPU + Docker) via SSH to CPU cluster
-    echo "Running innerloop_creation_3.py on CPU cluster via SSH..."
-    ssh "${CPU_CLUSTER_USER}@${CPU_CLUSTER_HOST}" "cd ${REMOTE_WORK_DIR}/src/optimization_loop/Inner_loop && conda activate creative-genai && python3 innerloop_creation_3.py --iteration $i"
-    
-    if [ $? -ne 0 ]; then
-        echo "Error: innerloop_creation_3.py failed on CPU cluster"
-        exit 1
-    fi
+    # Run inner_loop_creation_4 (CPU + Docker) via SSH to CPU cluster
 
-    # Run inner_loop_creation_4 (GPU only, no Docker)
-    python3 innerloop_creation_4.py --iteration "$i"
-
+    echo "Running innerloop_creation_4.py on CPU cluster via SSH..."
+    ssh "${CPU_CLUSTER_USER}@${CPU_CLUSTER_HOST}" "cd ${REMOTE_WORK_DIR}/src/optimization_loop/Inner_loop && conda activate creative-genai && python3 innerloop_creation_4.py --iteration $i"
     echo "Iteration $i completed!"
 done
