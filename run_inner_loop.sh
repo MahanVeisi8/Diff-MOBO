@@ -24,7 +24,7 @@ for ((i=0; i<15; i++)); do
         fi
     fi
     # Run inner_loop_creation_3 (GPU only, no Docker)
-    python innerloop_creation_3.py --iteration "$i"
+    CUDA_LAUNCH_BLOCKING=1 python innerloop_creation_3.py --iteration "$i"
 
     # Run inner_loop_creation_4 (CPU + Docker) via SSH to CPU cluster
 

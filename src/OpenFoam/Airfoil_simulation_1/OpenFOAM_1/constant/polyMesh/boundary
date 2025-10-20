@@ -21,50 +21,50 @@ FoamFile
     {
         type            empty;
         physicalType    patch;
-        nFaces          41175;
-        startFace       61436;
+        nFaces          39528;
+        startFace       58994;
     }
     back
     {
         type            empty;
         physicalType    patch;
-        nFaces          41175;
-        startFace       102611;
+        nFaces          39528;
+        startFace       98522;
     }
     exit
     {
         type            patch;
         physicalType    patch;
         nFaces          50;
-        startFace       143786;
+        startFace       138050;
     }
     bottom
     {
         type            patch;
         physicalType    patch;
         nFaces          50;
-        startFace       143836;
+        startFace       138100;
     }
     inlet
     {
         type            patch;
         physicalType    patch;
         nFaces          50;
-        startFace       143886;
+        startFace       138150;
     }
     top
     {
         type            patch;
         physicalType    patch;
         nFaces          50;
-        startFace       143936;
+        startFace       138200;
     }
     aerofoil
     {
         type            wall;
         physicalType    patch;
-        nFaces          453;
-        startFace       143986;
+        nFaces          396;
+        startFace       138250;
     }
 )
 

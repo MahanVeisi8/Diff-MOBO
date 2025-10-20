@@ -67,6 +67,7 @@ if __name__== "__main__":
 
     iterations = config["process"]["iterations"]
     num_cores = config["process"]["number_of_cores"]
+    num_cores = 1
     docker_mount_path = config["docker_setup"]["docker_mount_path"]
     docker_container_id = config["docker_setup"]["docker_container_id"]
     NUM_TO_GENERATE = config["sampling"]["number_to_generate"]

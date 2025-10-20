@@ -294,6 +294,7 @@ def GEN_UA(config,problem_uncertainty:BO_surrogate_uncertainty,diffusion,device 
                         mutation=GaussianMutation(sigma=0.1),  # ✅ Gaussian-preserving mutation
                         crossover=GaussianBlendCrossover(alpha=0.5)
                       )
+    print("Starting optimization...")
     res = minimize(problem_uncertainty,
                 algorithm,
                 ('n_gen', number_generations),
