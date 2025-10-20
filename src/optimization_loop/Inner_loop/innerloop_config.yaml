@@ -5,10 +5,10 @@ process:
 
 docker_setup:
   docker_mount_path: "../../OpenFoam"
-  docker_container_id: "f897792b6b56"  # make sure it has been started 
+  docker_container_id: "e14b8f8d728c"  # make sure it has been started 
 
 model:
-  device : "cpu"
+  device : "cuda"
   unet_checkpoint: "../../../src/diffusion_notebooks/DIffusion_model_weigths_and_datas/dpp_0.1_autonorm_true_125_from_base_ddpm/model_epoch_124.pt"
 
 sampling: 
@@ -16,7 +16,7 @@ sampling:
   batch_size : 128
 
 UA_surrogate_model:
-  device: "cpu"
+  device: "cuda"
   saved_update_path: "../../../src/optimization_loop/Inner_loop/UA_surrogate_weights/updated/UA_surrogate_model_10_channel.pt"
   learning_rate: 0.0001
   batch_size: 128

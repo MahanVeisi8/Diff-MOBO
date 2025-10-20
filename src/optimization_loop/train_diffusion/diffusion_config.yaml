@@ -13,7 +13,7 @@ diffusion_train:
   LAMBDA_QUALITY : 0.5
   if_dpp: True
   DPP_WEIGTHS : [0.5,0.5]
-  Unet_starting_path : "src/diffusion_notebooks/DIffusion_model_weigths_and_datas/model_epoch_499_RMSnorm_unscaled.pt/model_epoch_499_RMSnorm_unscaled.pt"
+  Unet_starting_path : "src/diffusion_notebooks/DIffusion_model_weigths_and_datas/model_epoch_499_RMSnorm_unscaled.pt"
   
 data:
   # for  diffusion training
@@ -30,7 +30,7 @@ data:
 UA_surrogate_model:
 
   device : "cuda"
-  init_path: "/home/bardiya/projects/diffusion_air_manifolding/codes/creative-generativeai-diffusion/src/surrogate_models/mlp_best_model_final.pt"
+  init_path: "src/surrogate_models/mlp_best_model_final.pt"
   # init_cl_path: "src/optimization_loop/Inner_loop/UA_surrogate_weights/cl/mlp_best_model_cl_150_200_200_150.pt"
   # init_cd_path: "src/optimization_loop/Inner_loop/UA_surrogate_weights/cd/mlp_best_model_cd_200_300_300_200.pt"
   all_weigths_path: None

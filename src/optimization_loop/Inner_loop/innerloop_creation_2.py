@@ -56,7 +56,8 @@ if __name__ == "__main__":
     # """
     # The main Hyperparams
     # """
-    device = config["model"]['device']
+    # # # # # device = config["model"]['device']
+    device = 'cpu'
     NUM_TO_GENERATE = config['sampling']["number_to_generate"]
     BATCH_SIZE = config['sampling']["batch_size"]
     Unet_checkpoint_path = config["model"]['unet_checkpoint']

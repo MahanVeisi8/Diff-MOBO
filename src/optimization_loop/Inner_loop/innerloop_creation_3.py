@@ -71,7 +71,8 @@ if __name__== "__main__":
     docker_container_id = config["docker_setup"]["docker_container_id"]
     NUM_TO_GENERATE = config["sampling"]["number_to_generate"]
     BATCH_SIZE = config["sampling"]["batch_size"]
-    device = config["model"]["device"]
+    # # device = config["model"]["device"]
+    device = 'cpu'
     Unet_checkpoint_path = config["model"]["unet_checkpoint"]
     saving_path = rf"src/optimization_loop/Inner_loop/Database/DB_innerloop.npy"
     number_generations = config["genetic_algorithm"]["number_generations"]
