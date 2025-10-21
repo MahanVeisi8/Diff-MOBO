@@ -1,6 +1,6 @@
 diffusion_train:
   device: "cuda"
-  EPOCHS: 50
+  EPOCHS: 100
   LR : 0.001
   NUM_WORKERS: 255
   BATCH_SIZE : 128
@@ -9,7 +9,7 @@ diffusion_train:
   LOG_DIR : "src/optimization_loop/train_diffusion/weigths/Unet_logs"
   dpp_epoch_tres : -100
   cash_dpp_loss : 0
-  LAMBDA_DPP : 0.1
+  LAMBDA_DPP : 0.01
   LAMBDA_QUALITY : 0.5
   if_dpp: True
   DPP_WEIGTHS : [0.5,0.5]
