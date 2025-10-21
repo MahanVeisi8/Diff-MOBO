@@ -9,8 +9,8 @@ docker_setup:
 
 model:
   device : "cuda"
-  # unet_checkpoint: "../../../src/optimization_loop/train_diffusion/weigths/Unet_weights/model_epoch_49.pt"
-  unet_checkpoint: "../../../src/diffusion_notebooks/DIffusion_model_weigths_and_datas/model_epoch_499_RMSnorm_unscaled.pt"
+  unet_checkpoint: "../../../src/optimization_loop/train_diffusion/weigths/Unet_weights/model_epoch_49.pt"
+  # unet_checkpoint: "../../../src/diffusion_notebooks/DIffusion_model_weigths_and_datas/model_epoch_499_RMSnorm_unscaled.pt"
 
 sampling: 
   number_to_generate : 1000
