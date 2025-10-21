@@ -47,18 +47,22 @@ class GaussianBlendCrossover(Crossover):
         self.alpha = alpha
 
     def _do(self, problem, X, **kwargs):
-        n_matings = X.shape[0]
-        n_var = problem.n_var
-        Y = np.empty_like(X)
+        # # n_matings = X.shape[0]
+        # # n_var = problem.n_var
+        # # Y = np.empty_like(X)
+        # pymoo passes X with shape (n_parents, n_matings, n_var)
+        n_parents, n_matings, n_var = X.shape
+        # Create output with shape (n_offsprings, n_matings, n_var)
+        Y = np.empty((self.n_offsprings, n_matings, n_var), dtype=X.dtype)
 
         for i in range(n_matings):
-            p1, p2 = X[i, 0, :], X[i, 1, :]
+            p1, p2 = X[0, i, :], X[1, i, :]
             # Gaussian blend — both parents contribute randomly
             mask = np.random.rand(n_var) < self.alpha
             child1 = np.where(mask, p1, p2)
             child2 = np.where(mask, p2, p1)
-            Y[i, 0, :] = child1
-            Y[i, 1, :] = child2
+            Y[0, i, :] = child1
+            Y[1, i, :] = child2
         return Y    
 
 class BO_surrogate_uncertainty(Problem):
