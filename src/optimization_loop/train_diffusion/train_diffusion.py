@@ -128,7 +128,7 @@ def calculate_dpp_loss_multi_objective(surrogate_model , generated_samples ,last
     generated_samples = generated_samples.reshape(gen_shape[0], -1)
     cl_scaled ,cd_scaled = torch.chunk(labels ,chunks=2, dim =1)
     # define the quality
-    y = torch.stack([cl_scaled, (cl_scaled/cd_scaled + EPS)], dim=1)
+    y = torch.stack([cl_scaled, -cd_scaled], dim=1)
     quality = (random_quality_weigths * y).sum(dim =1)
 
     # Compute the similarity matrix
