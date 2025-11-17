@@ -67,7 +67,7 @@ if __name__== "__main__":
 
     iterations = config["process"]["iterations"]
     num_cores = config["process"]["number_of_cores"]
-    num_cores = 1
+    # num_cores = 1
     docker_mount_path = config["docker_setup"]["docker_mount_path"]
     docker_container_id = config["docker_setup"]["docker_container_id"]
     NUM_TO_GENERATE = config["sampling"]["number_to_generate"]
@@ -95,6 +95,7 @@ if __name__== "__main__":
         channels=2,  # X and Y
         dropout=0.1
     ).to(device)  # or .to(device)
+    Unet_model.load_state_dict(torch.load(Unet_checkpoint_path, weights_only=True))
 
     # Create the same diffusion wrapper
     diffusion = GaussianDiffusion1D(

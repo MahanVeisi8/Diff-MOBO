@@ -68,6 +68,8 @@ if __name__ == "__main__":
         channels=2,  # X and Y
         dropout=0.1
     ).to(device)  # or .to(device)
+    Unet_model.load_state_dict(torch.load(Unet_checkpoint_path, weights_only=True))
+    
 
     # Create the same diffusion wrapper
     diffusion = GaussianDiffusion1D(
