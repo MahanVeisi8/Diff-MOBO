@@ -1,8 +1,8 @@
-# Generative Airfoil
+# Diff-MOBO : Diffusion-Guided Multi-Objective Bayesian Optimization for
+Creative Engineering Design
 
 <img src="assets/creative_diffusion_logo.png" alt="Creative Diffusion Logo" width="200"/>
 
-Generate, simulate, and evaluate 2D airfoil shapes using diffusion models, Bayesian optimization, neural surrogates, and OpenFOAM.
 
 ---
 
@@ -12,13 +12,11 @@ Generate, simulate, and evaluate 2D airfoil shapes using diffusion models, Bayes
   <img src="assets/Picture1.jpg" alt="High-level schematic overview" width="600"/>
 </p>
 
-*Temporary figure — shows the conceptual flow of the diffusion + surrogate + optimization loop.*
 
 <p align="center">
-  <img src="assets/Picture2.jpg" alt="Full flowchart of the pipeline" width="800"/>
+  <img src="assets/Picture2.png" alt="Full flowchart of the pipeline" width="800"/>
 </p>
 
-*Temporary figure — illustrates the detailed data flow between modules.*
 
 ---
 
