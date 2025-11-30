@@ -8,7 +8,7 @@
 ## Paper
 **Title**: Diff-MOBO : Diffusion-Guided Multi-Objective Bayesian Optimization for
 Creative Engineering Design  
-**Authors**: [Mahan Veisi](https://github.com/MahanVeisi8),  Bardiya Kariminia, Navid Ansari, Kevin Tirta Wijaya, Vahid Babaei
+**Authors**: [Mahan Veisi](https://mahanveisi8.github.io/),  Bardiya Kariminia, Navid Ansari, Kevin Tirta Wijaya, Vahid Babaei
 
 
 ## Overview
