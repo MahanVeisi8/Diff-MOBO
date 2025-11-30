@@ -9,13 +9,13 @@ Generate, simulate, and evaluate 2D airfoil shapes using diffusion models, Bayes
 ## Overview
 
 <p align="center">
-  <img src="assets/schematic_overview.png" alt="High-level schematic overview" width="600"/>
+  <img src="assets/Picture1.jpg" alt="High-level schematic overview" width="600"/>
 </p>
 
 *Temporary figure — shows the conceptual flow of the diffusion + surrogate + optimization loop.*
 
 <p align="center">
-  <img src="assets/total_flowchart.png" alt="Full flowchart of the pipeline" width="800"/>
+  <img src="assets/Picture2.jpg" alt="Full flowchart of the pipeline" width="800"/>
 </p>
 
 *Temporary figure — illustrates the detailed data flow between modules.*
